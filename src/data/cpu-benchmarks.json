@@ -1,0 +1,87 @@
+[
+  {
+    "name": "Intel Pentium G4560",
+    "aliases": ["intel pentium g4560", "pentium g4560"],
+    "score": 16
+  },
+  {
+    "name": "Intel Core i3-4130",
+    "aliases": ["intel core i3-4130", "i3-4130"],
+    "score": 20
+  },
+  {
+    "name": "AMD FX-8310",
+    "aliases": ["amd fx-8310", "fx-8310"],
+    "score": 18
+  },
+  {
+    "name": "Intel Core i5-3570K",
+    "aliases": ["intel core i5-3570k", "i5-3570k"],
+    "score": 26
+  },
+  {
+    "name": "Intel Core i3-8100",
+    "aliases": ["intel core i3-8100", "i3-8100"],
+    "score": 30
+  },
+  {
+    "name": "AMD Ryzen 5 1600",
+    "aliases": ["amd ryzen 5 1600", "ryzen 5 1600"],
+    "score": 34
+  },
+  {
+    "name": "Intel Core i7-6700",
+    "aliases": ["intel core i7-6700", "i7-6700"],
+    "score": 40
+  },
+  {
+    "name": "Intel Core i5-8400",
+    "aliases": ["intel core i5-8400", "i5-8400"],
+    "score": 42
+  },
+  {
+    "name": "AMD Ryzen 5 3600",
+    "aliases": ["amd ryzen 5 3600", "ryzen 5 3600"],
+    "score": 48
+  },
+  {
+    "name": "AMD Ryzen 5 3600X",
+    "aliases": ["amd ryzen 5 3600x", "ryzen 5 3600x"],
+    "score": 50
+  },
+  {
+    "name": "Intel Core i7-8700K",
+    "aliases": ["intel core i7-8700k", "i7-8700k"],
+    "score": 52
+  },
+  {
+    "name": "AMD Ryzen 7 3700X",
+    "aliases": ["amd ryzen 7 3700x", "ryzen 7 3700x"],
+    "score": 56
+  },
+  {
+    "name": "Intel Core i9-9900K",
+    "aliases": ["intel core i9-9900k", "i9-9900k"],
+    "score": 58
+  },
+  {
+    "name": "Intel Core i5-12400",
+    "aliases": ["intel core i5-12400", "i5-12400"],
+    "score": 60
+  },
+  {
+    "name": "AMD Ryzen 5 5600X",
+    "aliases": ["amd ryzen 5 5600x", "ryzen 5 5600x"],
+    "score": 62
+  },
+  {
+    "name": "Intel Core i7-12700K",
+    "aliases": ["intel core i7-12700k", "i7-12700k"],
+    "score": 70
+  },
+  {
+    "name": "AMD Ryzen 9 5900X",
+    "aliases": ["amd ryzen 9 5900x", "ryzen 9 5900x"],
+    "score": 72
+  }
+]

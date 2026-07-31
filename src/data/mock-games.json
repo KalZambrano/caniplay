@@ -1,0 +1,125 @@
+[
+  {
+    "id": "570",
+    "name": "Dota 2",
+    "headerImage": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/570/header.jpg",
+    "genres": ["Acción", "Estrategia", "Free To Play"],
+    "shortDescription": "MOBA competitivo gratuito con más de un centenar de héroes jugables.",
+    "releaseDate": "9 jul 2013",
+    "requirements": {
+      "minimum": {
+        "os": "windows",
+        "cpu": "Dual core from Intel or AMD at 2.8 GHz",
+        "gpu": "NVIDIA GeForce 8600/9600GT, ATI/AMD Radeon HD2600/3600",
+        "ramGb": 4,
+        "storageGb": 60,
+        "directx": "11"
+      },
+      "recommended": null
+    }
+  },
+  {
+    "id": "demo-1",
+    "name": "Nebula Drift (demo)",
+    "headerImage": "",
+    "genres": ["Aventura", "Indie"],
+    "shortDescription": "Juego ficticio de ejemplo — exploración espacial en baja resolución.",
+    "releaseDate": null,
+    "requirements": {
+      "minimum": {
+        "os": "windows",
+        "cpu": "Intel Core i3-4130",
+        "gpu": "NVIDIA GeForce GT 1030",
+        "ramGb": 4,
+        "storageGb": 3,
+        "directx": "10"
+      },
+      "recommended": {
+        "os": "windows",
+        "cpu": "Intel Core i5-8400",
+        "gpu": "NVIDIA GeForce GTX 1050 Ti",
+        "ramGb": 8,
+        "storageGb": 3,
+        "directx": "11"
+      }
+    }
+  },
+  {
+    "id": "demo-2",
+    "name": "Stonebound Keep (demo)",
+    "headerImage": "",
+    "genres": ["Supervivencia", "Mundo abierto"],
+    "shortDescription": "Juego ficticio de ejemplo — construcción y supervivencia medieval.",
+    "releaseDate": null,
+    "requirements": {
+      "minimum": {
+        "os": "windows",
+        "cpu": "AMD Ryzen 5 1600",
+        "gpu": "AMD Radeon RX 570",
+        "ramGb": 8,
+        "storageGb": 25,
+        "directx": "11"
+      },
+      "recommended": {
+        "os": "windows",
+        "cpu": "AMD Ryzen 5 3600",
+        "gpu": "NVIDIA GeForce RTX 2060",
+        "ramGb": 16,
+        "storageGb": 25,
+        "directx": "12"
+      }
+    }
+  },
+  {
+    "id": "demo-3",
+    "name": "Aftershock Protocol (demo)",
+    "headerImage": "",
+    "genres": ["Acción", "Shooter"],
+    "shortDescription": "Juego ficticio de ejemplo — shooter AAA de alta exigencia gráfica.",
+    "releaseDate": null,
+    "requirements": {
+      "minimum": {
+        "os": "windows",
+        "cpu": "Intel Core i5-8400",
+        "gpu": "NVIDIA GeForce RTX 2060",
+        "ramGb": 12,
+        "storageGb": 80,
+        "directx": "12"
+      },
+      "recommended": {
+        "os": "windows",
+        "cpu": "Intel Core i7-12700K",
+        "gpu": "NVIDIA GeForce RTX 4070",
+        "ramGb": 16,
+        "storageGb": 80,
+        "directx": "12"
+      }
+    }
+  },
+  {
+    "id": "demo-4",
+    "name": "Wanderlight (demo)",
+    "headerImage": "",
+    "genres": ["Casual", "Simulación"],
+    "shortDescription": "Juego ficticio de ejemplo — simulador relajado de vida en pueblo.",
+    "releaseDate": null,
+    "requirements": {
+      "minimum": {
+        "os": "windows",
+        "cpu": "Qualcomm Snapdragon 8cx",
+        "gpu": "Intel Iris Xe Graphics",
+        "ramGb": 8,
+        "storageGb": 6,
+        "directx": "11"
+      },
+      "recommended": {
+        "os": "windows",
+        "cpu": "Intel Core i5-12400",
+        "gpu": "Intel Arc A750",
+        "ramGb": 16,
+        "storageGb": 6,
+        "directx": "12"
+      }
+    }
+  }
+]
