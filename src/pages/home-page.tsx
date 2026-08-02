@@ -35,12 +35,12 @@ export function HomePage() {
 
   return (
     <div className="flex flex-col gap-16">
-      <section className="grid gap-8 lg:grid-cols-2 lg:items-center">
-        <div>
+      <section className="flex flex-col gap-8">
+        <div className="max-w-2xl">
           <h1 className="font-display text-4xl font-bold leading-tight text-text sm:text-5xl">
             ¿Tu PC <span className="text-brand">corre</span> ese juego?
           </h1>
-          <p className="mt-4 max-w-md text-text-muted">
+          <p className="mt-4 text-text-muted">
             RigScan escanea tu equipo en el navegador y lo compara contra los requisitos mínimos y
             recomendados de cualquier juego de Steam.
           </p>

@@ -7,7 +7,7 @@ export type ScanStatus = 'scanning' | 'done'
 interface UseHardwareDetectionResult {
   hardware: DetectedHardware
   status: ScanStatus
-  setCpuModel: (model: string) => void
+  setCpuModel: (model: string | null) => void
 }
 
 /**
@@ -33,8 +33,8 @@ export function useHardwareDetection(): UseHardwareDetectionResult {
     }
   }, [])
 
-  const setCpuModel = useCallback((model: string) => {
-    setHardware((previous) => ({ ...previous, cpuModel: model.trim() || null }))
+  const setCpuModel = useCallback((model: string | null) => {
+    setHardware((previous) => ({ ...previous, cpuModel: model?.trim() || null }))
   }, [])
 
   return { hardware, status, setCpuModel }

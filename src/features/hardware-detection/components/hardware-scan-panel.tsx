@@ -1,8 +1,9 @@
 import { Cpu, MemoryStick, MonitorCog, Layers } from 'lucide-react'
-import { Input } from '@/components/ui/input'
+import { Combobox } from '@/components/ui/combobox'
 import { useHardwareContext } from '../context/hardware-context'
 import { SpecPill } from './spec-pill'
 import { formatCores, formatRam, formatVram } from '../utils/format-hardware'
+import { CPU_MODEL_OPTIONS } from '../utils/cpu-options'
 
 export function HardwareScanPanel() {
   const { hardware, status, setCpuModel } = useHardwareContext()
@@ -62,11 +63,13 @@ export function HardwareScanPanel() {
         >
           Modelo de CPU (no se puede detectar automáticamente)
         </label>
-        <Input
+        <Combobox
           id="cpu-model"
-          placeholder="Ej. Intel Core i5-9600K, AMD Ryzen 5 3600…"
-          defaultValue={hardware.cpuModel ?? ''}
-          onBlur={(event) => setCpuModel(event.target.value)}
+          options={CPU_MODEL_OPTIONS}
+          value={hardware.cpuModel}
+          onChange={setCpuModel}
+          placeholder="Busca tu CPU… ej. Ryzen 5 3600"
+          emptyMessage="No encontramos ese modelo en nuestra base de datos."
         />
       </div>
 

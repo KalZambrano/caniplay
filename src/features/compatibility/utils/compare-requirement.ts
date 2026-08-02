@@ -2,6 +2,7 @@ import gpuBenchmarks from '@/data/gpu-benchmarks.json'
 import cpuBenchmarks from '@/data/cpu-benchmarks.json'
 import { findBenchmarkMatch } from '@/lib/benchmark-lookup'
 import { COMPATIBILITY_WARN_THRESHOLD_RATIO } from '@/config/constants'
+import { formatRam } from '@/features/hardware-detection/utils/format-hardware'
 import type { DetectedHardware } from '@/features/hardware-detection/types/hardware.types'
 import type { HardwareRequirement } from '@/features/game-search/types/game.types'
 import type {
@@ -19,43 +20,47 @@ export function compareRam(
 ): ComponentVerdict {
   const required = requirement.ramGb
   const detected = hardware.ramGb
+  const requirementLabel = required !== null ? `${required} GB` : 'No especificado'
 
   if (required === null) {
-    return { component: 'ram', status: 'unknown', detail: 'El juego no especifica RAM requerida.' }
+    return {
+      component: 'ram',
+      status: 'unknown',
+      requirementLabel,
+      detectedLabel: detected !== null ? formatRam(detected) : 'No detectada',
+    }
   }
 
   if (detected === null) {
-    return { component: 'ram', status: 'unknown', detail: 'No se pudo detectar tu RAM.' }
+    return { component: 'ram', status: 'unknown', requirementLabel, detectedLabel: 'No detectada' }
   }
 
   if (detected >= required) {
     return {
       component: 'ram',
       status: 'pass',
-      detail: `${detected} GB detectados ≥ ${required} GB requeridos.`,
+      requirementLabel,
+      detectedLabel: formatRam(detected),
     }
   }
 
   return {
     component: 'ram',
     status: 'warn',
-    detail: `El navegador detecta ${detected} GB, por debajo de los ${required} GB requeridos — esta lectura es una estimación mínima, tu RAM real podría ser mayor.`,
+    requirementLabel,
+    detectedLabel: formatRam(detected),
+    note: 'Estimación mínima del navegador — tu RAM real podría ser mayor.',
   }
 }
 
 export function compareStorage(requirement: HardwareRequirement): ComponentVerdict {
-  if (requirement.storageGb === null) {
-    return {
-      component: 'storage',
-      status: 'unknown',
-      detail: 'El juego no especifica espacio requerido.',
-    }
-  }
-
   return {
     component: 'storage',
     status: 'unknown',
-    detail: `Necesitas al menos ${requirement.storageGb} GB libres. El navegador no puede leer tu espacio en disco.`,
+    requirementLabel:
+      requirement.storageGb !== null ? `${requirement.storageGb} GB` : 'No especificado',
+    detectedLabel: 'No verificable',
+    note: 'El navegador no puede leer tu espacio en disco.',
   }
 }
 
@@ -64,14 +69,28 @@ function compareByBenchmark(
   requiredName: string | null,
   table: readonly BenchmarkEntry[],
   component: 'cpu' | 'gpu',
-  missingDetectedDetail: string,
+  missingDetectedLabel: string,
+  missingDetectedNote: string,
 ): ComponentVerdict {
+  const requirementLabel = requiredName ?? 'No especificado'
+
   if (!requiredName) {
-    return { component, status: 'unknown', detail: 'El juego no especifica este componente.' }
+    return {
+      component,
+      status: 'unknown',
+      requirementLabel,
+      detectedLabel: detectedName ?? missingDetectedLabel,
+    }
   }
 
   if (!detectedName) {
-    return { component, status: 'unknown', detail: missingDetectedDetail }
+    return {
+      component,
+      status: 'unknown',
+      requirementLabel,
+      detectedLabel: missingDetectedLabel,
+      note: missingDetectedNote,
+    }
   }
 
   const requiredMatch = findBenchmarkMatch(requiredName, table)
@@ -81,7 +100,9 @@ function compareByBenchmark(
     return {
       component,
       status: 'unknown',
-      detail: `No pudimos identificar "${requiredName}" en nuestra base de datos de referencia.`,
+      requirementLabel,
+      detectedLabel: detectedName,
+      note: `No pudimos identificar "${requiredName}" en nuestra base de datos de referencia.`,
     }
   }
 
@@ -89,32 +110,34 @@ function compareByBenchmark(
     return {
       component,
       status: 'unknown',
-      detail: `No reconocemos "${detectedName}" en nuestra base de datos de referencia todavía.`,
+      requirementLabel,
+      detectedLabel: detectedName,
+      note: 'No lo reconocemos en nuestra base de datos todavía.',
     }
   }
 
   const ratio = detectedMatch.score / requiredMatch.score
 
   if (ratio >= 1) {
-    return {
-      component,
-      status: 'pass',
-      detail: `${detectedMatch.name} supera a ${requiredMatch.name}, el requisito.`,
-    }
+    return { component, status: 'pass', requirementLabel, detectedLabel: detectedName }
   }
 
   if (ratio >= COMPATIBILITY_WARN_THRESHOLD_RATIO) {
     return {
       component,
       status: 'warn',
-      detail: `${detectedMatch.name} está algo por debajo de ${requiredMatch.name} — probablemente corra con ajustes reducidos.`,
+      requirementLabel,
+      detectedLabel: detectedName,
+      note: 'Probablemente corra, pero con ajustes gráficos reducidos.',
     }
   }
 
   return {
     component,
     status: 'fail',
-    detail: `${detectedMatch.name} está por debajo de ${requiredMatch.name}, el requisito.`,
+    requirementLabel,
+    detectedLabel: detectedName,
+    note: 'Por debajo del requisito.',
   }
 }
 
@@ -127,6 +150,7 @@ export function compareGpu(
     requirement.gpu,
     typedGpuBenchmarks,
     'gpu',
+    'No detectada',
     'No se pudo detectar tu GPU.',
   )
 }
@@ -140,6 +164,7 @@ export function compareCpu(
     requirement.cpu,
     typedCpuBenchmarks,
     'cpu',
-    'Ingresa el modelo de tu CPU para verificar este requisito.',
+    'No ingresado',
+    'Selecciona tu CPU para verificar este requisito.',
   )
 }

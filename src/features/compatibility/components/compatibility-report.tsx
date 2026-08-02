@@ -3,31 +3,44 @@ import { VerdictBadge } from './verdict-badge'
 import { RequirementRow } from './requirement-row'
 import type { CompatibilityReportData, RequirementVerdict } from '../types/compatibility.types'
 
-interface CompatibilityReportProps {
-  report: CompatibilityReportData
+interface RequirementTierCardProps {
+  label: 'Mínimos' | 'Recomendados'
+  tier: RequirementVerdict | null
 }
 
-function RequirementTierCard({ tier }: { tier: RequirementVerdict | null }) {
-  const title = tier?.tier === 'recommended' ? 'Recomendados' : 'Mínimos'
-
+/**
+ * The tier being displayed is passed in explicitly as `label` rather than
+ * read off `tier.tier` — when `tier` is null there's nothing to read a tier
+ * name from, and inferring it produced a real bug (a missing "Recomendados"
+ * tier used to render as a second, incorrect "Mínimos" card).
+ */
+function RequirementTierCard({ label, tier }: RequirementTierCardProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <h3 className="font-display text-sm font-semibold uppercase tracking-wide text-text-muted">
-          {title}
+          {label}
         </h3>
         {tier && <VerdictBadge status={tier.overall} size="lg" />}
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-0">
         {tier ? (
           <div className="divide-y divide-border">
+            <div className="grid grid-cols-2 gap-4 px-4 py-2">
+              <span className="text-[0.65rem] uppercase tracking-widest text-text-faint">
+                Requisito
+              </span>
+              <span className="text-[0.65rem] uppercase tracking-widest text-text-faint">
+                Tu equipo
+              </span>
+            </div>
             {tier.components.map((component) => (
               <RequirementRow key={component.component} verdict={component} />
             ))}
           </div>
         ) : (
-          <p className="text-sm text-text-muted">
-            Este juego no especifica requisitos {title.toLowerCase()}.
+          <p className="p-4 text-sm text-text-muted">
+            Este juego no especifica requisitos {label.toLowerCase()}.
           </p>
         )}
       </CardContent>
@@ -35,11 +48,15 @@ function RequirementTierCard({ tier }: { tier: RequirementVerdict | null }) {
   )
 }
 
+interface CompatibilityReportProps {
+  report: CompatibilityReportData
+}
+
 export function CompatibilityReport({ report }: CompatibilityReportProps) {
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
-      <RequirementTierCard tier={report.minimum} />
-      <RequirementTierCard tier={report.recommended} />
+    <div className="flex flex-col gap-4">
+      <RequirementTierCard label="Mínimos" tier={report.minimum} />
+      {report.recommended && <RequirementTierCard label="Recomendados" tier={report.recommended} />}
     </div>
   )
 }

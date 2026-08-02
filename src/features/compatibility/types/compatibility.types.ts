@@ -10,7 +10,12 @@ export type VerdictStatus = 'pass' | 'warn' | 'fail' | 'unknown'
 export interface ComponentVerdict {
   component: ComponentKey
   status: VerdictStatus
-  detail: string
+  /** The raw requirement as the game states it, unmodified — shown as-is, never rephrased. */
+  requirementLabel: string
+  /** What was detected or manually entered for this component. */
+  detectedLabel: string
+  /** Short explanation, mainly for warn/unknown cases (why it's unverified, etc.). */
+  note?: string
 }
 
 export interface RequirementVerdict {

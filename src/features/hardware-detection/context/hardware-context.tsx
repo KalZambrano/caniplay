@@ -5,7 +5,7 @@ import type { DetectedHardware } from '../types/hardware.types'
 interface HardwareContextValue {
   hardware: DetectedHardware
   status: ScanStatus
-  setCpuModel: (model: string) => void
+  setCpuModel: (model: string | null) => void
 }
 
 const HardwareContext = createContext<HardwareContextValue | null>(null)
