@@ -1,4 +1,4 @@
-import { ScanSearch, Gamepad2, ListChecks } from 'lucide-react'
+// import { ScanSearch, Gamepad2, ListChecks } from 'lucide-react'
 import { HardwareScanPanel } from '@/features/hardware-detection/components/hardware-scan-panel'
 import { SearchBar } from '@/features/game-search/components/search-bar'
 import { GameResultsGrid } from '@/features/game-search/components/game-results-grid'
@@ -7,26 +7,26 @@ import { useGameSearch } from '@/features/game-search/hooks/use-game-search'
 import { useFeaturedGames } from '@/features/game-search/hooks/use-featured-games'
 import { usePageTitle } from '@/hooks/use-page-title'
 
-const STEPS = [
-  {
-    icon: ScanSearch,
-    title: 'Detectamos tu equipo',
-    description: 'GPU, RAM y núcleos, directo desde tu navegador.',
-  },
-  {
-    icon: Gamepad2,
-    title: 'Buscas un juego',
-    description: 'Escribe el nombre y lo cruzamos con sus requisitos.',
-  },
-  {
-    icon: ListChecks,
-    title: 'Ves el veredicto',
-    description: 'Mínimos y recomendados, componente por componente.',
-  },
-] as const
+// const STEPS = [
+//   {
+//     icon: ScanSearch,
+//     title: 'Detectamos tu equipo',
+//     description: 'GPU, RAM y núcleos, directo desde tu navegador.',
+//   },
+//   {
+//     icon: Gamepad2,
+//     title: 'Buscas un juego',
+//     description: 'Escribe el nombre y lo cruzamos con sus requisitos.',
+//   },
+//   {
+//     icon: ListChecks,
+//     title: 'Ves el veredicto',
+//     description: 'Mínimos y recomendados, componente por componente.',
+//   },
+// ] as const
 
 export function HomePage() {
-  usePageTitle('RigScan — ¿Corre en tu PC?')
+  usePageTitle('CanIPlay — ¿Tu equipo puede correrlo?')
 
   const { query, setQuery, results, status, errorMessage } = useGameSearch()
   const { games: featuredGames } = useFeaturedGames()
@@ -36,20 +36,19 @@ export function HomePage() {
   return (
     <div className="flex flex-col gap-16">
       <section className="flex flex-col gap-8">
-        <div className="max-w-2xl">
-          <h1 className="font-display text-4xl font-bold leading-tight text-text sm:text-5xl">
+        <div className="max-w-2xl mx-auto">
+          <h1 className="font-display text-4xl font-bold leading-tight text-text sm:text-5xl text-center">
             ¿Tu PC <span className="text-brand">corre</span> ese juego?
           </h1>
-          <p className="mt-4 text-text-muted">
-            RigScan escanea tu equipo en el navegador y lo compara contra los requisitos mínimos y
-            recomendados de cualquier juego de Steam.
+          <p className="mt-4 text-text-muted text-center">
+            Descubre qué juegos puede ejecutar tu equipo.
           </p>
           <SearchBar value={query} onChange={setQuery} className="mt-6" />
         </div>
         <HardwareScanPanel />
       </section>
 
-      <section className="grid gap-6 sm:grid-cols-3">
+      {/* <section className="grid gap-6 sm:grid-cols-3">
         {STEPS.map(({ icon: Icon, title, description }, index) => (
           <div key={title} className="flex gap-3">
             <span className="font-mono text-sm text-text-faint">
@@ -62,7 +61,7 @@ export function HomePage() {
             </div>
           </div>
         ))}
-      </section>
+      </section> */}
 
       <section>
         {isSearching ? (

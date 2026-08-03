@@ -20,16 +20,6 @@ interface ComboboxProps {
   id?: string
 }
 
-/**
- * A text input that only ever resolves to one of `options` — typing filters
- * the list, but the value only changes when an option is actually picked
- * (or cleared). Used where a free-text field would let through values that
- * can never be matched later (e.g. a CPU model with a typo).
- *
- * The option list renders in a portal to `document.body` so it never gets
- * clipped by a parent's `overflow: hidden`/`auto`, and its position is
- * recalculated on open/scroll/resize.
- */
 export function Combobox({
   options,
   value,
@@ -42,7 +32,9 @@ export function Combobox({
   const [isOpen, setIsOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 })
+
   const containerRef = useRef<HTMLDivElement>(null)
+  const listRef = useRef<HTMLUListElement>(null) // 👈 importante
 
   const selectedLabel = options.find((option) => option.value === value)?.label ?? ''
 
@@ -56,8 +48,8 @@ export function Combobox({
     const rect = containerRef.current?.getBoundingClientRect()
     if (!rect) return
     setCoords({
-      top: rect.bottom + 4, // sin + window.scrollY
-      left: rect.left, // sin + window.scrollX
+      top: rect.bottom + 4,
+      left: rect.left,
       width: rect.width,
     })
   }
@@ -71,19 +63,26 @@ export function Combobox({
     if (!isOpen) return
 
     function handleClickOutside(event: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsOpen(false)
-        setQuery('')
+      const target = event.target as Node
+
+      // Si el click es dentro del input O dentro del listado del portal → no cerrar
+      if (containerRef.current?.contains(target) || listRef.current?.contains(target)) {
+        return
       }
+
+      setIsOpen(false)
+      setQuery('')
     }
 
     function handleReposition() {
       updateCoords()
     }
 
+    // mousedown sigue siendo bueno (cierra antes de que se propague el click en otros sitios)
     document.addEventListener('mousedown', handleClickOutside)
     window.addEventListener('scroll', handleReposition, true)
     window.addEventListener('resize', handleReposition)
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
       window.removeEventListener('scroll', handleReposition, true)
@@ -149,6 +148,7 @@ export function Combobox({
       {isOpen &&
         createPortal(
           <ul
+            ref={listRef}
             role="listbox"
             style={{ top: coords.top, left: coords.left, width: coords.width }}
             className="fixed z-50 max-h-56 overflow-auto rounded-md border border-border-strong bg-bg-inset py-1 shadow-lg"

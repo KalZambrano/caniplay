@@ -15,7 +15,7 @@ export function GameDetailPage() {
   const { hardware } = useHardwareContext()
   const report = useCompatibility(game?.requirements ?? null, hardware)
 
-  usePageTitle(game ? `${game.name} — RigScan` : 'RigScan')
+  usePageTitle(game ? `${game.name} — CanIPlay` : 'CanIPlay')
 
   if (status === 'loading') {
     return (
@@ -57,27 +57,43 @@ export function GameDetailPage() {
         Volver a buscar
       </Link>
 
-      <div className="overflow-hidden rounded-lg border border-border">
-        <div className="aspect-[16/6] bg-bg-inset">
-          {game.headerImage ? (
-            <img src={game.headerImage} alt={game.name} className="size-full object-cover" />
-          ) : (
-            <div
-              className={`flex size-full items-center justify-center bg-gradient-to-br ${pickGradient(game.id)}`}
-            >
-              <Gamepad2 className="size-10 text-text-faint" aria-hidden />
+      <div className='grid md:grid-cols-3 gap-5'>
+        <div className="overflow-hidden rounded-lg border border-border col-span-2">
+          <div className="aspect-16/7 bg-bg-inset">
+            {game.headerImage ? (
+              <img src={game.headerImage} alt={game.name} className="size-full object-cover" />
+            ) : (
+              <div
+                className={`flex size-full items-center justify-center bg-linear-to-br ${pickGradient(game.id)}`}
+              >
+                <Gamepad2 className="size-10 text-text-faint" aria-hidden />
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div>
+          <h1 className="font-display text-2xl font-bold text-text sm:text-3xl">{game.name}</h1>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {game.genres.map((genre) => (
+              <span
+                key={genre}
+                className="inline-flex items-center rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-400"
+              >
+                {genre}
+              </span>
+            ))}
+          </div>
+          {game.releaseDate && (
+            <div className="mt-3">
+              <p className="text-xs font-semibold uppercase tracking-wider text-text-faint">
+                Fecha de lanzamiento
+              </p>
+              <p className="mt-1 text-sm text-text-muted">{game.releaseDate}</p>
             </div>
           )}
+          <p className="mt-3 max-w-2xl text-text-muted">{game.shortDescription}</p>
         </div>
-      </div>
-
-      <div>
-        <h1 className="font-display text-2xl font-bold text-text sm:text-3xl">{game.name}</h1>
-        <p className="mt-1 text-sm text-text-muted">
-          {game.genres.join(' · ')}
-          {game.releaseDate && ` · ${game.releaseDate}`}
-        </p>
-        <p className="mt-3 max-w-2xl text-text-muted">{game.shortDescription}</p>
       </div>
 
       <CompatibilityReport report={report} />
