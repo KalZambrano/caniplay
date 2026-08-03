@@ -7,7 +7,7 @@ export function Header() {
       <div className="mx-auto flex h-16 max-w-5xl items-center px-4">
         <Link to="/" className="flex items-center gap-2 text-text hover:text-brand-strong">
           <ScanLine className="size-5 text-brand" aria-hidden />
-          <span className="font-display text-lg font-bold tracking-wide">RIGSCAN</span>
+          <span className="font-display text-lg font-bold tracking-wide">CanIPlay</span>
         </Link>
       </div>
     </header>

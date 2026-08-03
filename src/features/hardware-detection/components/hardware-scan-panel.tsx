@@ -14,7 +14,7 @@ export function HardwareScanPanel() {
       {isScanning && (
         <div
           aria-hidden
-          className="animate-scan-sweep pointer-events-none absolute inset-x-0 h-24 bg-gradient-to-b from-transparent via-brand/10 to-transparent"
+          className="animate-scan-sweep pointer-events-none absolute inset-x-0 h-24 bg-linear-to-b from-transparent via-brand/10 to-transparent"
         />
       )}
 

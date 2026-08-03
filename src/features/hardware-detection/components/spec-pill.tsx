@@ -20,7 +20,7 @@ export function SpecPill({ icon, label, value, confidence, className }: SpecPill
     <div className={cn('flex items-center gap-3 bg-bg-elevated px-4 py-3', className)}>
       <span className="text-text-faint">{icon}</span>
       <div className="flex flex-col">
-        <span className="font-mono text-[0.65rem] uppercase tracking-widest text-text-faint">
+        <span className="font-mono text-[0.65rem] uppercase tracking-widest text-brand-strong">
           {label}
         </span>
         <span className="font-mono text-sm text-text">

@@ -27,10 +27,10 @@ function RequirementTierCard({ label, tier }: RequirementTierCardProps) {
         {tier ? (
           <div className="divide-y divide-border">
             <div className="grid grid-cols-2 gap-4 px-4 py-2">
-              <span className="text-[0.65rem] uppercase tracking-widest text-text-faint">
+              <span className="text-[0.65rem] uppercase tracking-widest font-semibold text-primary bg-primary/10 px-2 py-1 rounded text-center">
                 Requisito
               </span>
-              <span className="text-[0.65rem] uppercase tracking-widest text-text-faint">
+              <span className="text-[0.65rem] uppercase tracking-widest font-semibold text-primary bg-primary/10 px-2 py-1 rounded text-center">
                 Tu equipo
               </span>
             </div>
