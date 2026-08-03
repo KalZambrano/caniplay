@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, useLayoutEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { Search, X } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { normalizeSearchText } from '@/lib/normalize-search-text'
@@ -24,6 +25,10 @@ interface ComboboxProps {
  * the list, but the value only changes when an option is actually picked
  * (or cleared). Used where a free-text field would let through values that
  * can never be matched later (e.g. a CPU model with a typo).
+ *
+ * The option list renders in a portal to `document.body` so it never gets
+ * clipped by a parent's `overflow: hidden`/`auto`, and its position is
+ * recalculated on open/scroll/resize.
  */
 export function Combobox({
   options,
@@ -36,6 +41,7 @@ export function Combobox({
 }: ComboboxProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [query, setQuery] = useState('')
+  const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 })
   const containerRef = useRef<HTMLDivElement>(null)
 
   const selectedLabel = options.find((option) => option.value === value)?.label ?? ''
@@ -45,6 +51,21 @@ export function Combobox({
     if (!target) return options
     return options.filter((option) => normalizeSearchText(option.label).includes(target))
   }, [options, query])
+
+  const updateCoords = () => {
+    const rect = containerRef.current?.getBoundingClientRect()
+    if (!rect) return
+    setCoords({
+      top: rect.bottom + 4, // sin + window.scrollY
+      left: rect.left, // sin + window.scrollX
+      width: rect.width,
+    })
+  }
+
+  useLayoutEffect(() => {
+    if (!isOpen) return
+    updateCoords()
+  }, [isOpen])
 
   useEffect(() => {
     if (!isOpen) return
@@ -56,8 +77,18 @@ export function Combobox({
       }
     }
 
+    function handleReposition() {
+      updateCoords()
+    }
+
     document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    window.addEventListener('scroll', handleReposition, true)
+    window.addEventListener('resize', handleReposition)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      window.removeEventListener('scroll', handleReposition, true)
+      window.removeEventListener('resize', handleReposition)
+    }
   }, [isOpen])
 
   function selectOption(option: ComboboxOption) {
@@ -115,33 +146,36 @@ export function Combobox({
         )}
       </div>
 
-      {isOpen && (
-        <ul
-          role="listbox"
-          className="absolute z-20 mt-1 max-h-56 w-full overflow-auto rounded-md border border-border-strong bg-bg-inset py-1 shadow-lg"
-        >
-          {filteredOptions.length === 0 ? (
-            <li className="px-3 py-2 text-sm text-text-faint">{emptyMessage}</li>
-          ) : (
-            filteredOptions.map((option) => (
-              <li key={option.value}>
-                <button
-                  type="button"
-                  role="option"
-                  aria-selected={option.value === value}
-                  onClick={() => selectOption(option)}
-                  className={cn(
-                    'block w-full px-3 py-2 text-left text-sm hover:bg-bg-elevated',
-                    option.value === value ? 'text-brand-strong' : 'text-text',
-                  )}
-                >
-                  {option.label}
-                </button>
-              </li>
-            ))
-          )}
-        </ul>
-      )}
+      {isOpen &&
+        createPortal(
+          <ul
+            role="listbox"
+            style={{ top: coords.top, left: coords.left, width: coords.width }}
+            className="fixed z-50 max-h-56 overflow-auto rounded-md border border-border-strong bg-bg-inset py-1 shadow-lg"
+          >
+            {filteredOptions.length === 0 ? (
+              <li className="px-3 py-2 text-sm text-text-faint">{emptyMessage}</li>
+            ) : (
+              filteredOptions.map((option) => (
+                <li key={option.value}>
+                  <button
+                    type="button"
+                    role="option"
+                    aria-selected={option.value === value}
+                    onClick={() => selectOption(option)}
+                    className={cn(
+                      'block w-full px-3 py-2 text-left text-sm hover:bg-bg-elevated',
+                      option.value === value ? 'text-brand-strong' : 'text-text',
+                    )}
+                  >
+                    {option.label}
+                  </button>
+                </li>
+              ))
+            )}
+          </ul>,
+          document.body,
+        )}
     </div>
   )
 }
