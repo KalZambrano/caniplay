@@ -47,6 +47,8 @@ export function GameDetailPage() {
     )
   }
 
+  console.log(game)
+
   return (
     <div className="flex flex-col gap-6">
       <Link
@@ -58,7 +60,7 @@ export function GameDetailPage() {
       </Link>
 
       <div className='grid md:grid-cols-3 gap-5'>
-        <div className="overflow-hidden rounded-lg border border-border col-span-2">
+        <div className="overflow-hidden border border-border col-span-2">
           <div className="aspect-16/7 bg-bg-inset">
             {game.headerImage ? (
               <img src={game.headerImage} alt={game.name} className="size-full object-cover" />

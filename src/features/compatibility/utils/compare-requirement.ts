@@ -6,13 +6,15 @@ import { formatRam } from '@/features/hardware-detection/utils/format-hardware'
 import type { DetectedHardware } from '@/features/hardware-detection/types/hardware.types'
 import type { HardwareRequirement } from '@/features/game-search/types/game.types'
 import type {
-  BenchmarkEntry,
   ComponentVerdict,
+  CpuBenchmarkEntry,
   GpuBenchmarkEntry,
 } from '../types/compatibility.types'
+import { parseGenericCpuSpec, type GenericCpuSpec } from './parse-generic-cpu-spec'
+import { parseGenericGpuSpec } from './parse-generic-gpu-spec'
 
 const typedGpuBenchmarks = gpuBenchmarks as GpuBenchmarkEntry[]
-const typedCpuBenchmarks = cpuBenchmarks as BenchmarkEntry[]
+const typedCpuBenchmarks = cpuBenchmarks as CpuBenchmarkEntry[]
 
 export function compareRam(
   hardware: DetectedHardware,
@@ -64,62 +66,18 @@ export function compareStorage(requirement: HardwareRequirement): ComponentVerdi
   }
 }
 
-function compareByBenchmark(
-  detectedName: string | null,
-  requiredName: string | null,
-  table: readonly BenchmarkEntry[],
+/** Shared "known model vs known model" scoring, once both sides resolved to a table entry. */
+function buildRatioVerdict(
   component: 'cpu' | 'gpu',
-  missingDetectedLabel: string,
-  missingDetectedNote: string,
+  requirementLabel: string,
+  detectedLabel: string,
+  detectedScore: number,
+  requiredScore: number,
 ): ComponentVerdict {
-  const requirementLabel = requiredName ?? 'No especificado'
-
-  if (!requiredName) {
-    return {
-      component,
-      status: 'unknown',
-      requirementLabel,
-      detectedLabel: detectedName ?? missingDetectedLabel,
-    }
-  }
-
-  if (!detectedName) {
-    return {
-      component,
-      status: 'unknown',
-      requirementLabel,
-      detectedLabel: missingDetectedLabel,
-      note: missingDetectedNote,
-    }
-  }
-
-  const requiredMatch = findBenchmarkMatch(requiredName, table)
-  const detectedMatch = findBenchmarkMatch(detectedName, table)
-
-  if (!requiredMatch) {
-    return {
-      component,
-      status: 'unknown',
-      requirementLabel,
-      detectedLabel: detectedName,
-      note: `No pudimos identificar "${requiredName}" en nuestra base de datos de referencia.`,
-    }
-  }
-
-  if (!detectedMatch) {
-    return {
-      component,
-      status: 'unknown',
-      requirementLabel,
-      detectedLabel: detectedName,
-      note: 'No lo reconocemos en nuestra base de datos todavía.',
-    }
-  }
-
-  const ratio = detectedMatch.score / requiredMatch.score
+  const ratio = detectedScore / requiredScore
 
   if (ratio >= 1) {
-    return { component, status: 'pass', requirementLabel, detectedLabel: detectedName }
+    return { component, status: 'pass', requirementLabel, detectedLabel }
   }
 
   if (ratio >= COMPATIBILITY_WARN_THRESHOLD_RATIO) {
@@ -127,7 +85,7 @@ function compareByBenchmark(
       component,
       status: 'warn',
       requirementLabel,
-      detectedLabel: detectedName,
+      detectedLabel,
       note: 'Probablemente corra, pero con ajustes gráficos reducidos.',
     }
   }
@@ -136,8 +94,180 @@ function compareByBenchmark(
     component,
     status: 'fail',
     requirementLabel,
-    detectedLabel: detectedName,
+    detectedLabel,
     note: 'Por debajo del requisito.',
+  }
+}
+
+function formatMb(mb: number): string {
+  return mb >= 1024 ? `${(mb / 1024).toFixed(mb % 1024 === 0 ? 0 : 1)} GB` : `${mb} MB`
+}
+
+/**
+ * Level 2 fallback for CPU: only reached when the requirement text didn't
+ * match any known model. Compares whatever dimensions the text actually
+ * states (core count, clock speed) against what we know about the user's
+ * rig — auto-detected core count, and the selected CPU's base clock. Never
+ * returns "fail": this is an approximate heuristic, not a model match, so a
+ * shortfall is reported as "warn" rather than a confident rejection.
+ */
+function compareCpuByGenericSpec(
+  hardware: DetectedHardware,
+  requirementLabel: string,
+  spec: GenericCpuSpec,
+): ComponentVerdict {
+  const detectedEntry = hardware.cpuModel
+    ? findBenchmarkMatch(hardware.cpuModel, typedCpuBenchmarks)
+    : null
+  const checks: { ok: boolean; label: string }[] = []
+
+  if (spec.cores !== null && hardware.cpuCores !== null) {
+    checks.push({ ok: hardware.cpuCores >= spec.cores, label: `${spec.cores}+ núcleos` })
+  }
+
+  if (spec.ghz !== null && detectedEntry) {
+    checks.push({ ok: detectedEntry.baseClockGhz >= spec.ghz, label: `${spec.ghz} GHz` })
+  }
+
+  const detectedLabel =
+    hardware.cpuModel ??
+    (hardware.cpuCores !== null ? `${hardware.cpuCores} núcleos detectados` : 'No detectado')
+
+  if (checks.length === 0) {
+    return {
+      component: 'cpu',
+      status: 'unknown',
+      requirementLabel,
+      detectedLabel,
+      note: 'Selecciona tu CPU para comparar contra este requisito genérico.',
+    }
+  }
+
+  const failed = checks.filter((check) => !check.ok)
+
+  if (failed.length === 0) {
+    return {
+      component: 'cpu',
+      status: 'pass',
+      requirementLabel,
+      detectedLabel,
+      note: `Comparado por especificación genérica (${checks.map((c) => c.label).join(' y ')}), no por modelo exacto.`,
+    }
+  }
+
+  return {
+    component: 'cpu',
+    status: 'warn',
+    requirementLabel,
+    detectedLabel,
+    note: `Por debajo de ${failed.map((c) => c.label).join(' y ')} — estimado por especificación genérica, no por modelo exacto.`,
+  }
+}
+
+export function compareCpu(
+  hardware: DetectedHardware,
+  requirement: HardwareRequirement,
+): ComponentVerdict {
+  const requirementText = requirement.cpu
+  const requirementLabel = requirementText ?? 'No especificado'
+
+  if (!requirementText) {
+    return {
+      component: 'cpu',
+      status: 'unknown',
+      requirementLabel,
+      detectedLabel: hardware.cpuModel ?? 'No ingresado',
+    }
+  }
+
+  // Level 1: the requirement names a specific model we recognize.
+  const requiredMatch = findBenchmarkMatch(requirementText, typedCpuBenchmarks)
+
+  if (requiredMatch) {
+    if (!hardware.cpuModel) {
+      return {
+        component: 'cpu',
+        status: 'unknown',
+        requirementLabel,
+        detectedLabel: 'No ingresado',
+        note: 'Selecciona tu CPU para verificar este requisito.',
+      }
+    }
+
+    // The CPU field is a combobox constrained to this same table, so this
+    // should always resolve — kept defensive in case that ever changes.
+    const detectedMatch = findBenchmarkMatch(hardware.cpuModel, typedCpuBenchmarks)
+    if (!detectedMatch) {
+      return {
+        component: 'cpu',
+        status: 'unknown',
+        requirementLabel,
+        detectedLabel: hardware.cpuModel,
+        note: 'No lo reconocemos en nuestra base de datos todavía.',
+      }
+    }
+
+    return buildRatioVerdict(
+      'cpu',
+      requirementLabel,
+      hardware.cpuModel,
+      detectedMatch.score,
+      requiredMatch.score,
+    )
+  }
+
+  // Level 2: not a known model — see if it's a generic spec instead (e.g. "Dual core at 2.8 GHz").
+  const genericSpec = parseGenericCpuSpec(requirementText)
+  if (genericSpec) {
+    return compareCpuByGenericSpec(hardware, requirementLabel, genericSpec)
+  }
+
+  return {
+    component: 'cpu',
+    status: 'unknown',
+    requirementLabel,
+    detectedLabel: hardware.cpuModel ?? 'No ingresado',
+    note: `No pudimos identificar "${requirementText}" en nuestra base de datos de referencia.`,
+  }
+}
+
+/** Level 2 fallback for GPU: compares an estimated VRAM figure, never returns "fail". */
+function compareGpuByGenericSpec(
+  hardware: DetectedHardware,
+  requirementLabel: string,
+  detectedName: string,
+  spec: { vramMb: number },
+): ComponentVerdict {
+  const detectedVramMb = hardware.gpu.vramGb !== null ? hardware.gpu.vramGb * 1024 : null
+
+  if (detectedVramMb === null) {
+    return {
+      component: 'gpu',
+      status: 'unknown',
+      requirementLabel,
+      detectedLabel: detectedName,
+      note: 'No pudimos estimar la VRAM de tu GPU para comparar este requisito genérico.',
+    }
+  }
+
+  const requiredLabel = formatMb(spec.vramMb)
+
+  if (detectedVramMb >= spec.vramMb) {
+    return {
+      component: 'gpu',
+      status: 'pass',
+      requirementLabel,
+      detectedLabel: detectedName,
+      note: `Comparado por VRAM estimada (≥ ${requiredLabel}), no por modelo exacto.`,
+    }
+  }
+
+  return {
+    component: 'gpu',
+    status: 'warn',
+    requirementLabel,
+    detectedLabel: detectedName,
+    note: `Tu VRAM estimada está por debajo de ${requiredLabel} — estimado, no por modelo exacto.`,
   }
 }
 
@@ -145,26 +275,64 @@ export function compareGpu(
   hardware: DetectedHardware,
   requirement: HardwareRequirement,
 ): ComponentVerdict {
-  return compareByBenchmark(
-    hardware.gpu.name,
-    requirement.gpu,
-    typedGpuBenchmarks,
-    'gpu',
-    'No detectada',
-    'No se pudo detectar tu GPU.',
-  )
-}
+  const requirementText = requirement.gpu
+  const requirementLabel = requirementText ?? 'No especificado'
+  const detectedName = hardware.gpu.name
 
-export function compareCpu(
-  hardware: DetectedHardware,
-  requirement: HardwareRequirement,
-): ComponentVerdict {
-  return compareByBenchmark(
-    hardware.cpuModel,
-    requirement.cpu,
-    typedCpuBenchmarks,
-    'cpu',
-    'No ingresado',
-    'Selecciona tu CPU para verificar este requisito.',
-  )
+  if (!requirementText) {
+    return {
+      component: 'gpu',
+      status: 'unknown',
+      requirementLabel,
+      detectedLabel: detectedName ?? 'No detectada',
+    }
+  }
+
+  if (!detectedName) {
+    return {
+      component: 'gpu',
+      status: 'unknown',
+      requirementLabel,
+      detectedLabel: 'No detectada',
+      note: 'No se pudo detectar tu GPU.',
+    }
+  }
+
+  // Level 1: the requirement names a specific model we recognize.
+  const requiredMatch = findBenchmarkMatch(requirementText, typedGpuBenchmarks)
+
+  if (requiredMatch) {
+    const detectedMatch = findBenchmarkMatch(detectedName, typedGpuBenchmarks)
+    if (!detectedMatch) {
+      return {
+        component: 'gpu',
+        status: 'unknown',
+        requirementLabel,
+        detectedLabel: detectedName,
+        note: 'No lo reconocemos en nuestra base de datos todavía.',
+      }
+    }
+
+    return buildRatioVerdict(
+      'gpu',
+      requirementLabel,
+      detectedName,
+      detectedMatch.score,
+      requiredMatch.score,
+    )
+  }
+
+  // Level 2: not a known model — see if it's a generic spec instead (e.g. "128 MB video card").
+  const genericSpec = parseGenericGpuSpec(requirementText)
+  if (genericSpec) {
+    return compareGpuByGenericSpec(hardware, requirementLabel, detectedName, genericSpec)
+  }
+
+  return {
+    component: 'gpu',
+    status: 'unknown',
+    requirementLabel,
+    detectedLabel: detectedName,
+    note: `No pudimos identificar "${requirementText}" en nuestra base de datos de referencia.`,
+  }
 }
