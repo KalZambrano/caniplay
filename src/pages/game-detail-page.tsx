@@ -2,6 +2,8 @@ import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, Gamepad2 } from 'lucide-react'
 import { Spinner } from '@/components/ui/spinner'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { cn } from '@/lib/cn'
 import { pickGradient } from '@/lib/pick-gradient'
 import { useGameDetail } from '@/features/game-search/hooks/use-game-detail'
 import { useHardwareContext } from '@/features/hardware-detection/context/hardware-context'
@@ -47,26 +49,44 @@ export function GameDetailPage() {
     )
   }
 
-  console.log(game)
-
   return (
     <div className="flex flex-col gap-6">
       <Link
         to="/"
-        className="inline-flex w-fit items-center gap-1.5 text-sm text-text-muted hover:text-text"
+        className="inline-flex w-fit items-center gap-1.5 text-sm text-text-muted transition-colors hover:text-text"
       >
         <ArrowLeft className="size-4" aria-hidden />
         Volver a buscar
       </Link>
 
-      <div className='grid md:grid-cols-3 gap-5'>
-        <div className="overflow-hidden border border-border col-span-2">
-          <div className="aspect-16/7 bg-bg-inset">
+      {/* Título y géneros a ancho completo: encajonados en la columna estrecha
+          del grid, el h1 se partía en tres líneas en escritorio. */}
+      <header className="flex flex-col gap-3">
+        <h1 className="font-display text-3xl font-bold leading-tight text-text sm:text-4xl">
+          {game.name}
+        </h1>
+        {game.genres.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {game.genres.map((genre) => (
+              <Badge key={genre} tone="brand">
+                {genre}
+              </Badge>
+            ))}
+          </div>
+        )}
+      </header>
+
+      <div className="grid gap-5 md:grid-cols-3">
+        <div className="overflow-hidden rounded-lg border border-border md:col-span-2">
+          <div className="aspect-header bg-bg-inset">
             {game.headerImage ? (
               <img src={game.headerImage} alt={game.name} className="size-full object-cover" />
             ) : (
               <div
-                className={`flex size-full items-center justify-center bg-linear-to-br ${pickGradient(game.id)}`}
+                className={cn(
+                  'flex size-full items-center justify-center bg-linear-to-br',
+                  pickGradient(game.id),
+                )}
               >
                 <Gamepad2 className="size-10 text-text-faint" aria-hidden />
               </div>
@@ -74,28 +94,50 @@ export function GameDetailPage() {
           </div>
         </div>
 
-        <div>
-          <h1 className="font-display text-2xl font-bold text-text sm:text-3xl">{game.name}</h1>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {game.genres.map((genre) => (
-              <span
-                key={genre}
-                className="inline-flex items-center rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-400"
-              >
-                {genre}
-              </span>
-            ))}
-          </div>
+        <aside className="flex flex-col gap-4 rounded-lg border border-border bg-bg-elevated p-4">
           {game.releaseDate && (
-            <div className="mt-3">
+            <div>
               <p className="text-xs font-semibold uppercase tracking-wider text-text-faint">
                 Fecha de lanzamiento
               </p>
               <p className="mt-1 text-sm text-text-muted">{game.releaseDate}</p>
             </div>
           )}
-          <p className="mt-3 max-w-2xl text-text-muted">{game.shortDescription}</p>
-        </div>
+
+          {game.developers.length > 0 && (
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-text-faint">
+                Desarrollado por
+              </p>
+              <p className="mt-1 text-sm text-text-muted">
+                {game.developers.map((developer, index) => (
+                  <span key={developer.name}>
+                    {index > 0 && ', '}
+                    <a
+                      href={developer.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-brand-strong transition-colors hover:text-brand hover:underline"
+                    >
+                      {developer.name}
+                    </a>
+                  </span>
+                ))}
+              </p>
+            </div>
+          )}
+
+          {game.shortDescription && (
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-text-faint">
+                Sobre el juego
+              </p>
+              <p className="mt-1 text-sm leading-relaxed text-text-muted">
+                {game.shortDescription}
+              </p>
+            </div>
+          )}
+        </aside>
       </div>
 
       <CompatibilityReport report={report} />

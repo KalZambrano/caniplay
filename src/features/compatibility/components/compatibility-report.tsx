@@ -17,7 +17,7 @@ interface RequirementTierCardProps {
 function RequirementTierCard({ label, tier }: RequirementTierCardProps) {
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-row items-center justify-between gap-3">
         <h3 className="font-display text-sm font-semibold uppercase tracking-wide text-text-muted">
           {label}
         </h3>
@@ -26,11 +26,16 @@ function RequirementTierCard({ label, tier }: RequirementTierCardProps) {
       <CardContent className="p-0">
         {tier ? (
           <div className="divide-y divide-border">
-            <div className="grid grid-cols-2 gap-4 px-4 py-2">
-              <span className="text-[0.65rem] uppercase tracking-widest font-semibold text-primary bg-primary/10 px-2 py-1 rounded text-center">
+            {/* Oculta debajo de `sm`, donde las filas se apilan y una cabecera
+                de dos columnas dejaría de corresponderse con nada.
+                El borde izquierdo transparente replica la caja de los paneles
+                de RequirementRow para que los títulos caigan justo sobre sus
+                columnas en vez de 2px a la izquierda. */}
+            <div className="hidden grid-cols-2 gap-4 bg-bg-inset px-4 py-2 sm:grid">
+              <span className="border-l-2 border-transparent px-3 font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-text-faint">
                 Requisito
               </span>
-              <span className="text-[0.65rem] uppercase tracking-widest font-semibold text-primary bg-primary/10 px-2 py-1 rounded text-center">
+              <span className="border-l-2 border-transparent px-3 font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-text-muted">
                 Tu equipo
               </span>
             </div>

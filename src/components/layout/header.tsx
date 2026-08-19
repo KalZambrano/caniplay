@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 export function Header() {
   return (
     <header className="sticky top-0 z-10 border-b border-border bg-bg/80 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-5xl items-center px-4">
+      <div className="mx-auto flex h-16 max-w-6xl items-center px-4">
         <Link to="/" className="flex items-center gap-2 text-text hover:text-brand-strong">
           <svg className="size-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12">
             <path

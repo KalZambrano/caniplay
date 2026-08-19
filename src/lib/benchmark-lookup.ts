@@ -6,8 +6,13 @@ import { normalizeHardwareName } from './normalize-hardware-name'
  *
  * Requirement text and detected GPU/CPU strings rarely match a table entry
  * character-for-character, so this tries an exact alias match first, then
- * falls back to the longest alias contained in the text (a min-spec line
- * like "Intel Core i5-9600K or AMD Ryzen 5 3600" contains two full aliases).
+ * falls back to scanning for aliases contained in the text.
+ *
+ * Cuando el texto contiene varios modelos —una línea de mínimos como
+ * "Intel Core i5-9600K or AMD Ryzen 5 3600" nombra dos— gana el de menor
+ * score: ese "or" significa que cualquiera de los dos basta, así que la
+ * barra real del juego es el más débil. Elegir por longitud del alias, como
+ * se hacía antes, daba un ganador arbitrario y podía inflar el requisito.
  *
  * Returns null rather than guessing when nothing matches — callers should
  * surface that as an "unknown" verdict, never a silent pass or fail.
@@ -27,17 +32,15 @@ export function findBenchmarkMatch<T extends BenchmarkEntry>(
   if (exactMatch) return exactMatch
 
   let bestMatch: T | null = null
-  let bestAliasLength = 0
 
   for (const entry of table) {
-    for (const alias of entry.aliases) {
+    const isContained = entry.aliases.some((alias) => {
       const normalizedAlias = normalizeHardwareName(alias)
-      const isContained = normalizedAlias.length > 2 && target.includes(normalizedAlias)
+      return normalizedAlias.length > 2 && target.includes(normalizedAlias)
+    })
 
-      if (isContained && normalizedAlias.length > bestAliasLength) {
-        bestMatch = entry
-        bestAliasLength = normalizedAlias.length
-      }
+    if (isContained && (bestMatch === null || entry.score < bestMatch.score)) {
+      bestMatch = entry
     }
   }
 

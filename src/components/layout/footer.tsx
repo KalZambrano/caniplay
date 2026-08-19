@@ -1,7 +1,7 @@
 export function Footer() {
   return (
     <footer className="border-t border-border">
-      <div className="mx-auto max-w-5xl px-4 py-8 text-center">
+      <div className="mx-auto max-w-6xl px-4 py-8 text-center">
         <div className="flex flex-col items-center gap-4">
           <p className="text-xs text-text-muted">
             Proyecto independiente, sin afiliación con Valve ni Steam.
