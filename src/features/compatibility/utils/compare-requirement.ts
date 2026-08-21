@@ -1,11 +1,13 @@
 import gpuBenchmarks from '@/data/gpu-benchmarks.json'
 import cpuBenchmarks from '@/data/cpu-benchmarks.json'
-import { findBenchmarkMatch } from '@/lib/benchmark-lookup'
+import { findBenchmarkMatch, splitModelAlternatives } from '@/lib/benchmark-lookup'
+import { describesSameModel, findApproximateBenchmarkMatch } from '@/lib/estimate-benchmark-match'
 import { COMPATIBILITY_WARN_THRESHOLD_RATIO } from '@/config/constants'
 import { formatRam } from '@/features/hardware-detection/utils/format-hardware'
 import type { DetectedHardware } from '@/features/hardware-detection/types/hardware.types'
 import type { HardwareRequirement } from '@/features/game-search/types/game.types'
 import type {
+  BenchmarkEntry,
   ComponentVerdict,
   CpuBenchmarkEntry,
   GpuBenchmarkEntry,
@@ -66,18 +68,83 @@ export function compareStorage(requirement: HardwareRequirement): ComponentVerdi
   }
 }
 
+/**
+ * Un modelo llevado a una entrada de la tabla, recordando si el nombre encajó
+ * de verdad o si solo pudimos situarlo junto a su pariente más cercano.
+ */
+interface ResolvedModel<T extends BenchmarkEntry> {
+  entry: T
+  approximate: boolean
+}
+
+/**
+ * Resuelve un nombre libre contra la tabla: primero por nombre/alias y, si el
+ * modelo no está tabulado, por el hermano de familia más parecido.
+ *
+ * Ese segundo intento es lo que evita el callejón sin salida de antes, donde
+ * cualquier SKU ausente de la tabla —y son la mayoría, porque no existe lista
+ * que las cubra todas— dejaba el requisito sin comparar.
+ */
+function resolveModel<T extends BenchmarkEntry>(
+  rawName: string | null | undefined,
+  table: readonly T[],
+): ResolvedModel<T> | null {
+  const matched = findBenchmarkMatch(rawName, table)
+
+  if (matched && rawName) {
+    // La comprobación solo tiene sentido sobre un nombre suelto: cuando el
+    // texto enumera alternativas, que la elegida no sea la primera es el
+    // funcionamiento normal, no un modelo perdido por el camino.
+    const namesOneModel = splitModelAlternatives(rawName).length === 1
+    return {
+      entry: matched,
+      approximate: namesOneModel && !describesSameModel(rawName, matched.name),
+    }
+  }
+
+  const approximate = findApproximateBenchmarkMatch(rawName, table)
+  return approximate ? { entry: approximate, approximate: true } : null
+}
+
+/** Deja claro qué lado de la comparación se apoyó en un modelo equivalente. */
+function buildApproximationNote(
+  required: ResolvedModel<BenchmarkEntry>,
+  detected: ResolvedModel<BenchmarkEntry>,
+): string | null {
+  const approximations: string[] = []
+
+  if (required.approximate) approximations.push(`el requisito contra ${required.entry.name}`)
+  if (detected.approximate) approximations.push(`tu equipo contra ${detected.entry.name}`)
+  if (approximations.length === 0) return null
+
+  return `No tenemos datos exactos de ese modelo, así que comparamos ${approximations.join(' y ')}, lo más parecido que conocemos.`
+}
+
+function joinNotes(...notes: (string | null | undefined)[]): string | undefined {
+  const present = notes.filter((note): note is string => Boolean(note))
+  return present.length > 0 ? present.join(' ') : undefined
+}
+
 /** Shared "known model vs known model" scoring, once both sides resolved to a table entry. */
-function buildRatioVerdict(
+function buildRatioVerdict<T extends BenchmarkEntry>(
   component: 'cpu' | 'gpu',
   requirementLabel: string,
   detectedLabel: string,
-  detectedScore: number,
-  requiredScore: number,
+  detected: ResolvedModel<T>,
+  required: ResolvedModel<T>,
 ): ComponentVerdict {
-  const ratio = detectedScore / requiredScore
+  const ratio = detected.entry.score / required.entry.score
+  const isApproximate = detected.approximate || required.approximate
+  const approximationNote = buildApproximationNote(required, detected)
 
   if (ratio >= 1) {
-    return { component, status: 'pass', requirementLabel, detectedLabel }
+    return {
+      component,
+      status: 'pass',
+      requirementLabel,
+      detectedLabel,
+      note: joinNotes(approximationNote),
+    }
   }
 
   if (ratio >= COMPATIBILITY_WARN_THRESHOLD_RATIO) {
@@ -86,7 +153,23 @@ function buildRatioVerdict(
       status: 'warn',
       requirementLabel,
       detectedLabel,
-      note: 'Probablemente corra, pero con ajustes gráficos reducidos.',
+      note: joinNotes(
+        'Probablemente corra, pero con ajustes gráficos reducidos.',
+        approximationNote,
+      ),
+    }
+  }
+
+  // Un "no cumple" es un veredicto tajante y solo se emite cuando ambos lados
+  // son el modelo real. Sobre un equivalente aproximado el margen de error
+  // puede ser mayor que la propia diferencia, así que se queda en aviso.
+  if (isApproximate) {
+    return {
+      component,
+      status: 'warn',
+      requirementLabel,
+      detectedLabel,
+      note: joinNotes('Parece quedar por debajo del requisito.', approximationNote),
     }
   }
 
@@ -116,9 +199,7 @@ function compareCpuByGenericSpec(
   requirementLabel: string,
   spec: GenericCpuSpec,
 ): ComponentVerdict {
-  const detectedEntry = hardware.cpuModel
-    ? findBenchmarkMatch(hardware.cpuModel, typedCpuBenchmarks)
-    : null
+  const detectedEntry = resolveModel(hardware.cpuModel, typedCpuBenchmarks)
   const checks: { ok: boolean; label: string }[] = []
 
   if (spec.cores !== null && hardware.cpuCores !== null) {
@@ -126,7 +207,7 @@ function compareCpuByGenericSpec(
   }
 
   if (spec.ghz !== null && detectedEntry) {
-    checks.push({ ok: detectedEntry.baseClockGhz >= spec.ghz, label: `${spec.ghz} GHz` })
+    checks.push({ ok: detectedEntry.entry.baseClockGhz >= spec.ghz, label: `${spec.ghz} GHz` })
   }
 
   const detectedLabel =
@@ -180,10 +261,10 @@ export function compareCpu(
     }
   }
 
-  // Level 1: the requirement names a specific model we recognize.
-  const requiredMatch = findBenchmarkMatch(requirementText, typedCpuBenchmarks)
+  // Level 1: the requirement names a model we recognize, exactly or by proximity.
+  const required = resolveModel(requirementText, typedCpuBenchmarks)
 
-  if (requiredMatch) {
+  if (required) {
     if (!hardware.cpuModel) {
       return {
         component: 'cpu',
@@ -194,10 +275,8 @@ export function compareCpu(
       }
     }
 
-    // The CPU field is a combobox constrained to this same table, so this
-    // should always resolve — kept defensive in case that ever changes.
-    const detectedMatch = findBenchmarkMatch(hardware.cpuModel, typedCpuBenchmarks)
-    if (!detectedMatch) {
+    const detected = resolveModel(hardware.cpuModel, typedCpuBenchmarks)
+    if (!detected) {
       return {
         component: 'cpu',
         status: 'unknown',
@@ -207,13 +286,7 @@ export function compareCpu(
       }
     }
 
-    return buildRatioVerdict(
-      'cpu',
-      requirementLabel,
-      hardware.cpuModel,
-      detectedMatch.score,
-      requiredMatch.score,
-    )
+    return buildRatioVerdict('cpu', requirementLabel, hardware.cpuModel, detected, required)
   }
 
   // Level 2: not a known model — see if it's a generic spec instead (e.g. "Dual core at 2.8 GHz").
@@ -227,7 +300,7 @@ export function compareCpu(
     status: 'unknown',
     requirementLabel,
     detectedLabel: hardware.cpuModel ?? 'No ingresado',
-    note: `No pudimos identificar "${requirementText}" en nuestra base de datos de referencia.`,
+    note: `No reconocemos "${requirementText}" ni encontramos un modelo equivalente, así que este requisito queda sin comparar.`,
   }
 }
 
@@ -298,12 +371,12 @@ export function compareGpu(
     }
   }
 
-  // Level 1: the requirement names a specific model we recognize.
-  const requiredMatch = findBenchmarkMatch(requirementText, typedGpuBenchmarks)
+  // Level 1: the requirement names a model we recognize, exactly or by proximity.
+  const required = resolveModel(requirementText, typedGpuBenchmarks)
 
-  if (requiredMatch) {
-    const detectedMatch = findBenchmarkMatch(detectedName, typedGpuBenchmarks)
-    if (!detectedMatch) {
+  if (required) {
+    const detected = resolveModel(detectedName, typedGpuBenchmarks)
+    if (!detected) {
       return {
         component: 'gpu',
         status: 'unknown',
@@ -313,13 +386,7 @@ export function compareGpu(
       }
     }
 
-    return buildRatioVerdict(
-      'gpu',
-      requirementLabel,
-      detectedName,
-      detectedMatch.score,
-      requiredMatch.score,
-    )
+    return buildRatioVerdict('gpu', requirementLabel, detectedName, detected, required)
   }
 
   // Level 2: not a known model — see if it's a generic spec instead (e.g. "128 MB video card").
@@ -333,6 +400,6 @@ export function compareGpu(
     status: 'unknown',
     requirementLabel,
     detectedLabel: detectedName,
-    note: `No pudimos identificar "${requirementText}" en nuestra base de datos de referencia.`,
+    note: `No reconocemos "${requirementText}" ni encontramos un modelo equivalente, así que este requisito queda sin comparar.`,
   }
 }

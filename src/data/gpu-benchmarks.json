@@ -1,158 +1,596 @@
 [
   {
-    "name": "Intel UHD Graphics 630",
-    "aliases": ["intel uhd graphics 630", "intel(r) uhd graphics 630", "uhd 630"],
-    "score": 4,
-    "vramGb": 2
+    "name": "ATI/AMD Radeon HD 2600/3600",
+    "aliases": [
+      "ati/amd radeon hd 2600/3600",
+      "ati/amd radeon hd2600/3600",
+      "radeon hd 2600",
+      "radeon hd 3600"
+    ],
+    "score": 1,
+    "vramGb": 1
   },
   {
-    "name": "Intel Iris Xe Graphics",
-    "aliases": ["intel iris xe graphics", "intel(r) iris(r) xe graphics", "iris xe"],
-    "score": 8,
-    "vramGb": 4
-  },
-  {
-    "name": "Intel Arc A750",
-    "aliases": ["intel arc a750"],
-    "score": 34,
-    "vramGb": 8
-  },
-  {
-    "name": "Intel Arc A770",
-    "aliases": ["intel arc a770"],
-    "score": 38,
-    "vramGb": 16
+    "name": "Intel HD Graphics 4000",
+    "aliases": [
+      "intel hd graphics 4000",
+      "hd graphics 4000",
+      "intel(r) hd graphics 4000",
+      "hd 4000"
+    ],
+    "score": 1,
+    "vramGb": 1
   },
   {
     "name": "NVIDIA GeForce 8600 / 9600GT",
-    "aliases": ["nvidia geforce 8600", "nvidia geforce 9600gt", "geforce 8600/9600gt"],
+    "aliases": [
+      "nvidia geforce 8600 / 9600gt",
+      "8600 / 9600gt",
+      "geforce 8600 / 9600gt",
+      "nvidia geforce 8600",
+      "nvidia geforce 9600gt",
+      "geforce 8600/9600gt"
+    ],
     "score": 1,
-    "vramGb": 0.5
+    "vramGb": 1
   },
   {
-    "name": "ATI/AMD Radeon HD 2600/3600",
-    "aliases": ["ati/amd radeon hd2600/3600", "radeon hd 2600", "radeon hd 3600"],
-    "score": 1,
-    "vramGb": 0.25
+    "name": "Intel UHD Graphics 620",
+    "aliases": [
+      "intel uhd graphics 620",
+      "uhd graphics 620",
+      "intel(r) uhd graphics 620",
+      "uhd 620"
+    ],
+    "score": 3,
+    "vramGb": 1
+  },
+  {
+    "name": "Intel UHD Graphics 630",
+    "aliases": [
+      "intel uhd graphics 630",
+      "uhd graphics 630",
+      "intel(r) uhd graphics 630",
+      "uhd 630"
+    ],
+    "score": 4,
+    "vramGb": 1
+  },
+  {
+    "name": "Intel Iris Xe Graphics",
+    "aliases": [
+      "intel iris xe graphics",
+      "iris xe graphics",
+      "intel(r) iris(r) xe graphics",
+      "iris xe"
+    ],
+    "score": 8,
+    "vramGb": 1
+  },
+  {
+    "name": "NVIDIA GeForce GTX 660",
+    "aliases": ["nvidia geforce gtx 660", "gtx 660", "geforce gtx 660"],
+    "score": 8,
+    "vramGb": 2
   },
   {
     "name": "NVIDIA GeForce GT 1030",
-    "aliases": ["nvidia geforce gt 1030", "geforce gt 1030"],
+    "aliases": ["nvidia geforce gt 1030", "gt 1030", "geforce gt 1030"],
     "score": 10,
     "vramGb": 2
   },
   {
+    "name": "NVIDIA GeForce GTX 750 Ti",
+    "aliases": ["nvidia geforce gtx 750 ti", "gtx 750 ti", "geforce gtx 750 ti"],
+    "score": 10,
+    "vramGb": 2
+  },
+  {
+    "name": "AMD Radeon RX 460",
+    "aliases": ["amd radeon rx 460", "rx 460", "radeon rx 460"],
+    "score": 11,
+    "vramGb": 2
+  },
+  {
+    "name": "NVIDIA GeForce GTX 760",
+    "aliases": ["nvidia geforce gtx 760", "gtx 760", "geforce gtx 760"],
+    "score": 11,
+    "vramGb": 2
+  },
+  {
+    "name": "NVIDIA GeForce GTX 1050",
+    "aliases": ["nvidia geforce gtx 1050", "gtx 1050", "geforce gtx 1050"],
+    "score": 13,
+    "vramGb": 2
+  },
+  {
+    "name": "NVIDIA GeForce GTX 770",
+    "aliases": ["nvidia geforce gtx 770", "gtx 770", "geforce gtx 770"],
+    "score": 13,
+    "vramGb": 2
+  },
+  {
+    "name": "AMD Radeon R9 280X",
+    "aliases": ["amd radeon r9 280x", "r9 280x", "radeon r9 280x"],
+    "score": 14,
+    "vramGb": 3
+  },
+  {
+    "name": "Intel Arc A380",
+    "aliases": ["intel arc a380", "arc a380"],
+    "score": 14,
+    "vramGb": 6
+  },
+  {
+    "name": "NVIDIA GeForce GTX 960",
+    "aliases": ["nvidia geforce gtx 960", "gtx 960", "geforce gtx 960"],
+    "score": 14,
+    "vramGb": 2
+  },
+  {
+    "name": "AMD Radeon R9 380",
+    "aliases": ["amd radeon r9 380", "r9 380", "radeon r9 380"],
+    "score": 15,
+    "vramGb": 4
+  },
+  {
     "name": "NVIDIA GeForce GTX 1050 Ti",
-    "aliases": ["nvidia geforce gtx 1050 ti", "gtx 1050 ti"],
+    "aliases": ["nvidia geforce gtx 1050 ti", "gtx 1050 ti", "geforce gtx 1050 ti"],
     "score": 16,
     "vramGb": 4
   },
   {
-    "name": "NVIDIA GeForce GTX 1650",
-    "aliases": ["nvidia geforce gtx 1650", "gtx 1650"],
+    "name": "NVIDIA GeForce GTX 780",
+    "aliases": ["nvidia geforce gtx 780", "gtx 780", "geforce gtx 780"],
+    "score": 16,
+    "vramGb": 3
+  },
+  {
+    "name": "AMD Radeon R9 290",
+    "aliases": ["amd radeon r9 290", "r9 290", "radeon r9 290"],
+    "score": 17,
+    "vramGb": 4
+  },
+  {
+    "name": "NVIDIA GeForce GTX 970",
+    "aliases": ["nvidia geforce gtx 970", "gtx 970", "geforce gtx 970"],
+    "score": 19,
+    "vramGb": 4
+  },
+  {
+    "name": "AMD Radeon RX 480",
+    "aliases": ["amd radeon rx 480", "rx 480", "radeon rx 480"],
+    "score": 20,
+    "vramGb": 8
+  },
+  {
+    "name": "AMD Radeon RX 570",
+    "aliases": ["amd radeon rx 570", "rx 570", "radeon rx 570"],
     "score": 20,
     "vramGb": 4
   },
   {
+    "name": "NVIDIA GeForce GTX 1650",
+    "aliases": ["nvidia geforce gtx 1650", "gtx 1650", "geforce gtx 1650"],
+    "score": 20,
+    "vramGb": 4
+  },
+  {
+    "name": "NVIDIA GeForce GTX 980",
+    "aliases": ["nvidia geforce gtx 980", "gtx 980", "geforce gtx 980"],
+    "score": 21,
+    "vramGb": 4
+  },
+  {
+    "name": "AMD Radeon RX 5500 XT",
+    "aliases": ["amd radeon rx 5500 xt", "rx 5500 xt", "radeon rx 5500 xt"],
+    "score": 22,
+    "vramGb": 8
+  },
+  {
+    "name": "AMD Radeon RX 580",
+    "aliases": ["amd radeon rx 580", "rx 580", "radeon rx 580", "rx 580 8gb"],
+    "score": 22,
+    "vramGb": 8
+  },
+  {
+    "name": "AMD Radeon RX 6500 XT",
+    "aliases": ["amd radeon rx 6500 xt", "rx 6500 xt", "radeon rx 6500 xt"],
+    "score": 22,
+    "vramGb": 4
+  },
+  {
+    "name": "AMD Radeon RX 590",
+    "aliases": ["amd radeon rx 590", "rx 590", "radeon rx 590"],
+    "score": 24,
+    "vramGb": 8
+  },
+  {
     "name": "NVIDIA GeForce GTX 1060",
-    "aliases": ["nvidia geforce gtx 1060", "gtx 1060", "gtx 1060 6gb", "gtx 1060 3gb"],
+    "aliases": [
+      "nvidia geforce gtx 1060",
+      "gtx 1060",
+      "geforce gtx 1060",
+      "gtx 1060 6gb",
+      "gtx 1060 3gb"
+    ],
     "score": 24,
     "vramGb": 6
   },
   {
+    "name": "NVIDIA GeForce GTX 1650 Super",
+    "aliases": ["nvidia geforce gtx 1650 super", "gtx 1650 super", "geforce gtx 1650 super"],
+    "score": 24,
+    "vramGb": 4
+  },
+  {
+    "name": "NVIDIA GeForce GTX 980 Ti",
+    "aliases": ["nvidia geforce gtx 980 ti", "gtx 980 ti", "geforce gtx 980 ti"],
+    "score": 24,
+    "vramGb": 6
+  },
+  {
+    "name": "NVIDIA GeForce GTX 1660",
+    "aliases": ["nvidia geforce gtx 1660", "gtx 1660", "geforce gtx 1660"],
+    "score": 26,
+    "vramGb": 6
+  },
+  {
+    "name": "NVIDIA GeForce GTX 1070",
+    "aliases": ["nvidia geforce gtx 1070", "gtx 1070", "geforce gtx 1070"],
+    "score": 28,
+    "vramGb": 8
+  },
+  {
     "name": "NVIDIA GeForce GTX 1660 Super",
-    "aliases": ["nvidia geforce gtx 1660 super", "gtx 1660 super", "gtx 1660"],
+    "aliases": ["nvidia geforce gtx 1660 super", "gtx 1660 super", "geforce gtx 1660 super"],
     "score": 28,
     "vramGb": 6
   },
   {
-    "name": "AMD Radeon RX 570",
-    "aliases": ["amd radeon rx 570", "radeon rx 570"],
-    "score": 20,
-    "vramGb": 4
-  },
-  {
-    "name": "AMD Radeon RX 5600 XT",
-    "aliases": ["amd radeon rx 5600 xt", "radeon rx 5600 xt"],
-    "score": 32,
-    "vramGb": 6
-  },
-  {
-    "name": "AMD Radeon RX 6600",
-    "aliases": ["amd radeon rx 6600", "radeon rx 6600"],
-    "score": 38,
-    "vramGb": 8
-  },
-  {
-    "name": "NVIDIA GeForce RTX 2060",
-    "aliases": ["nvidia geforce rtx 2060", "rtx 2060"],
-    "score": 34,
+    "name": "NVIDIA GeForce GTX 1660 Ti",
+    "aliases": ["nvidia geforce gtx 1660 ti", "gtx 1660 ti", "geforce gtx 1660 ti"],
+    "score": 29,
     "vramGb": 6
   },
   {
     "name": "NVIDIA GeForce RTX 3050",
-    "aliases": ["nvidia geforce rtx 3050", "rtx 3050"],
+    "aliases": ["nvidia geforce rtx 3050", "rtx 3050", "geforce rtx 3050"],
     "score": 30,
     "vramGb": 8
   },
   {
+    "name": "NVIDIA GeForce GTX 1070 Ti",
+    "aliases": ["nvidia geforce gtx 1070 ti", "gtx 1070 ti", "geforce gtx 1070 ti"],
+    "score": 31,
+    "vramGb": 8
+  },
+  {
+    "name": "AMD Radeon RX 5600 XT",
+    "aliases": ["amd radeon rx 5600 xt", "rx 5600 xt", "radeon rx 5600 xt"],
+    "score": 32,
+    "vramGb": 6
+  },
+  {
+    "name": "NVIDIA GeForce GTX 1080",
+    "aliases": ["nvidia geforce gtx 1080", "gtx 1080", "geforce gtx 1080"],
+    "score": 33,
+    "vramGb": 8
+  },
+  {
+    "name": "AMD Radeon RX 5700",
+    "aliases": ["amd radeon rx 5700", "rx 5700", "radeon rx 5700"],
+    "score": 34,
+    "vramGb": 8
+  },
+  {
+    "name": "Intel Arc A750",
+    "aliases": ["intel arc a750", "arc a750"],
+    "score": 34,
+    "vramGb": 8
+  },
+  {
+    "name": "NVIDIA GeForce RTX 2060",
+    "aliases": ["nvidia geforce rtx 2060", "rtx 2060", "geforce rtx 2060"],
+    "score": 34,
+    "vramGb": 6
+  },
+  {
+    "name": "AMD Radeon RX 5700 XT",
+    "aliases": ["amd radeon rx 5700 xt", "rx 5700 xt", "radeon rx 5700 xt"],
+    "score": 38,
+    "vramGb": 8
+  },
+  {
+    "name": "AMD Radeon RX 6600",
+    "aliases": ["amd radeon rx 6600", "rx 6600", "radeon rx 6600"],
+    "score": 38,
+    "vramGb": 8
+  },
+  {
+    "name": "Intel Arc A770",
+    "aliases": ["intel arc a770", "arc a770"],
+    "score": 38,
+    "vramGb": 16
+  },
+  {
+    "name": "Intel Arc B570",
+    "aliases": ["intel arc b570", "arc b570"],
+    "score": 38,
+    "vramGb": 10
+  },
+  {
+    "name": "NVIDIA GeForce RTX 2060 Super",
+    "aliases": ["nvidia geforce rtx 2060 super", "rtx 2060 super", "geforce rtx 2060 super"],
+    "score": 38,
+    "vramGb": 8
+  },
+  {
+    "name": "NVIDIA GeForce GTX 1080 Ti",
+    "aliases": ["nvidia geforce gtx 1080 ti", "gtx 1080 ti", "geforce gtx 1080 ti"],
+    "score": 40,
+    "vramGb": 11
+  },
+  {
+    "name": "NVIDIA GeForce RTX 2070",
+    "aliases": ["nvidia geforce rtx 2070", "rtx 2070", "geforce rtx 2070"],
+    "score": 40,
+    "vramGb": 8
+  },
+  {
     "name": "NVIDIA GeForce RTX 3060",
-    "aliases": ["nvidia geforce rtx 3060", "rtx 3060"],
+    "aliases": ["nvidia geforce rtx 3060", "rtx 3060", "geforce rtx 3060"],
     "score": 42,
     "vramGb": 12
   },
   {
+    "name": "AMD Radeon RX 6600 XT",
+    "aliases": ["amd radeon rx 6600 xt", "rx 6600 xt", "radeon rx 6600 xt"],
+    "score": 44,
+    "vramGb": 8
+  },
+  {
+    "name": "Intel Arc B580",
+    "aliases": ["intel arc b580", "arc b580"],
+    "score": 44,
+    "vramGb": 12
+  },
+  {
+    "name": "NVIDIA GeForce RTX 2070 Super",
+    "aliases": ["nvidia geforce rtx 2070 super", "rtx 2070 super", "geforce rtx 2070 super"],
+    "score": 44,
+    "vramGb": 8
+  },
+  {
+    "name": "AMD Radeon RX 6650 XT",
+    "aliases": ["amd radeon rx 6650 xt", "rx 6650 xt", "radeon rx 6650 xt"],
+    "score": 46,
+    "vramGb": 8
+  },
+  {
+    "name": "AMD Radeon RX 7600",
+    "aliases": ["amd radeon rx 7600", "rx 7600", "radeon rx 7600"],
+    "score": 46,
+    "vramGb": 8
+  },
+  {
+    "name": "NVIDIA GeForce RTX 2080",
+    "aliases": ["nvidia geforce rtx 2080", "rtx 2080", "geforce rtx 2080"],
+    "score": 46,
+    "vramGb": 8
+  },
+  {
     "name": "NVIDIA GeForce RTX 3060 Ti",
-    "aliases": ["nvidia geforce rtx 3060 ti", "rtx 3060 ti"],
+    "aliases": ["nvidia geforce rtx 3060 ti", "rtx 3060 ti", "geforce rtx 3060 ti"],
     "score": 48,
     "vramGb": 8
   },
   {
-    "name": "NVIDIA GeForce RTX 3070",
-    "aliases": ["nvidia geforce rtx 3070", "rtx 3070"],
-    "score": 54,
-    "vramGb": 8
-  },
-  {
-    "name": "NVIDIA GeForce RTX 3080",
-    "aliases": ["nvidia geforce rtx 3080", "rtx 3080"],
-    "score": 66,
-    "vramGb": 10
-  },
-  {
     "name": "AMD Radeon RX 6700 XT",
-    "aliases": ["amd radeon rx 6700 xt", "radeon rx 6700 xt"],
+    "aliases": ["amd radeon rx 6700 xt", "rx 6700 xt", "radeon rx 6700 xt"],
     "score": 50,
     "vramGb": 12
   },
   {
-    "name": "AMD Radeon RX 7800 XT",
-    "aliases": ["amd radeon rx 7800 xt", "radeon rx 7800 xt"],
-    "score": 68,
+    "name": "AMD Radeon RX 9060 XT",
+    "aliases": ["amd radeon rx 9060 xt", "rx 9060 xt", "radeon rx 9060 xt"],
+    "score": 50,
     "vramGb": 16
   },
   {
     "name": "NVIDIA GeForce RTX 4060",
-    "aliases": ["nvidia geforce rtx 4060", "rtx 4060"],
+    "aliases": ["nvidia geforce rtx 4060", "rtx 4060", "geforce rtx 4060"],
     "score": 50,
     "vramGb": 8
   },
   {
+    "name": "NVIDIA GeForce RTX 5060",
+    "aliases": ["nvidia geforce rtx 5060", "rtx 5060", "geforce rtx 5060"],
+    "score": 52,
+    "vramGb": 8
+  },
+  {
+    "name": "AMD Radeon RX 6750 XT",
+    "aliases": ["amd radeon rx 6750 xt", "rx 6750 xt", "radeon rx 6750 xt"],
+    "score": 54,
+    "vramGb": 12
+  },
+  {
+    "name": "NVIDIA GeForce RTX 2080 Ti",
+    "aliases": ["nvidia geforce rtx 2080 ti", "rtx 2080 ti", "geforce rtx 2080 ti"],
+    "score": 54,
+    "vramGb": 11
+  },
+  {
+    "name": "NVIDIA GeForce RTX 3070",
+    "aliases": ["nvidia geforce rtx 3070", "rtx 3070", "geforce rtx 3070"],
+    "score": 54,
+    "vramGb": 8
+  },
+  {
+    "name": "NVIDIA GeForce RTX 4060 Ti",
+    "aliases": ["nvidia geforce rtx 4060 ti", "rtx 4060 ti", "geforce rtx 4060 ti"],
+    "score": 56,
+    "vramGb": 8
+  },
+  {
+    "name": "NVIDIA GeForce RTX 3070 Ti",
+    "aliases": ["nvidia geforce rtx 3070 ti", "rtx 3070 ti", "geforce rtx 3070 ti"],
+    "score": 58,
+    "vramGb": 8
+  },
+  {
+    "name": "NVIDIA GeForce RTX 5060 Ti",
+    "aliases": ["nvidia geforce rtx 5060 ti", "rtx 5060 ti", "geforce rtx 5060 ti"],
+    "score": 58,
+    "vramGb": 16
+  },
+  {
+    "name": "AMD Radeon RX 6800",
+    "aliases": ["amd radeon rx 6800", "rx 6800", "radeon rx 6800"],
+    "score": 60,
+    "vramGb": 16
+  },
+  {
+    "name": "AMD Radeon RX 7700 XT",
+    "aliases": ["amd radeon rx 7700 xt", "rx 7700 xt", "radeon rx 7700 xt"],
+    "score": 60,
+    "vramGb": 12
+  },
+  {
     "name": "NVIDIA GeForce RTX 4070",
-    "aliases": ["nvidia geforce rtx 4070", "rtx 4070"],
+    "aliases": ["nvidia geforce rtx 4070", "rtx 4070", "geforce rtx 4070"],
     "score": 62,
     "vramGb": 12
   },
   {
+    "name": "NVIDIA GeForce RTX 3080",
+    "aliases": ["nvidia geforce rtx 3080", "rtx 3080", "geforce rtx 3080"],
+    "score": 66,
+    "vramGb": 10
+  },
+  {
+    "name": "AMD Radeon RX 6800 XT",
+    "aliases": ["amd radeon rx 6800 xt", "rx 6800 xt", "radeon rx 6800 xt"],
+    "score": 68,
+    "vramGb": 16
+  },
+  {
+    "name": "AMD Radeon RX 7800 XT",
+    "aliases": ["amd radeon rx 7800 xt", "rx 7800 xt", "radeon rx 7800 xt"],
+    "score": 68,
+    "vramGb": 16
+  },
+  {
+    "name": "NVIDIA GeForce RTX 5070",
+    "aliases": ["nvidia geforce rtx 5070", "rtx 5070", "geforce rtx 5070"],
+    "score": 68,
+    "vramGb": 12
+  },
+  {
+    "name": "NVIDIA GeForce RTX 4070 Super",
+    "aliases": ["nvidia geforce rtx 4070 super", "rtx 4070 super", "geforce rtx 4070 super"],
+    "score": 70,
+    "vramGb": 12
+  },
+  {
+    "name": "AMD Radeon RX 6900 XT",
+    "aliases": ["amd radeon rx 6900 xt", "rx 6900 xt", "radeon rx 6900 xt"],
+    "score": 72,
+    "vramGb": 16
+  },
+  {
+    "name": "AMD Radeon RX 9070",
+    "aliases": ["amd radeon rx 9070", "rx 9070", "radeon rx 9070"],
+    "score": 72,
+    "vramGb": 16
+  },
+  {
+    "name": "NVIDIA GeForce RTX 3080 Ti",
+    "aliases": ["nvidia geforce rtx 3080 ti", "rtx 3080 ti", "geforce rtx 3080 ti"],
+    "score": 72,
+    "vramGb": 12
+  },
+  {
+    "name": "NVIDIA GeForce RTX 4070 Ti",
+    "aliases": ["nvidia geforce rtx 4070 ti", "rtx 4070 ti", "geforce rtx 4070 ti"],
+    "score": 72,
+    "vramGb": 12
+  },
+  {
+    "name": "AMD Radeon RX 7900 GRE",
+    "aliases": ["amd radeon rx 7900 gre", "rx 7900 gre", "radeon rx 7900 gre"],
+    "score": 74,
+    "vramGb": 16
+  },
+  {
+    "name": "NVIDIA GeForce RTX 3090",
+    "aliases": ["nvidia geforce rtx 3090", "rtx 3090", "geforce rtx 3090"],
+    "score": 74,
+    "vramGb": 24
+  },
+  {
+    "name": "NVIDIA GeForce RTX 4070 Ti Super",
+    "aliases": [
+      "nvidia geforce rtx 4070 ti super",
+      "rtx 4070 ti super",
+      "geforce rtx 4070 ti super"
+    ],
+    "score": 76,
+    "vramGb": 16
+  },
+  {
     "name": "NVIDIA GeForce RTX 4080",
-    "aliases": ["nvidia geforce rtx 4080", "rtx 4080"],
+    "aliases": ["nvidia geforce rtx 4080", "rtx 4080", "geforce rtx 4080"],
     "score": 78,
     "vramGb": 16
   },
   {
+    "name": "AMD Radeon RX 9070 XT",
+    "aliases": ["amd radeon rx 9070 xt", "rx 9070 xt", "radeon rx 9070 xt"],
+    "score": 80,
+    "vramGb": 16
+  },
+  {
+    "name": "NVIDIA GeForce RTX 4080 Super",
+    "aliases": ["nvidia geforce rtx 4080 super", "rtx 4080 super", "geforce rtx 4080 super"],
+    "score": 80,
+    "vramGb": 16
+  },
+  {
+    "name": "NVIDIA GeForce RTX 5070 Ti",
+    "aliases": ["nvidia geforce rtx 5070 ti", "rtx 5070 ti", "geforce rtx 5070 ti"],
+    "score": 80,
+    "vramGb": 16
+  },
+  {
+    "name": "AMD Radeon RX 7900 XT",
+    "aliases": ["amd radeon rx 7900 xt", "rx 7900 xt", "radeon rx 7900 xt"],
+    "score": 82,
+    "vramGb": 20
+  },
+  {
+    "name": "NVIDIA GeForce RTX 5080",
+    "aliases": ["nvidia geforce rtx 5080", "rtx 5080", "geforce rtx 5080"],
+    "score": 88,
+    "vramGb": 16
+  },
+  {
+    "name": "AMD Radeon RX 7900 XTX",
+    "aliases": ["amd radeon rx 7900 xtx", "rx 7900 xtx", "radeon rx 7900 xtx"],
+    "score": 92,
+    "vramGb": 24
+  },
+  {
     "name": "NVIDIA GeForce RTX 4090",
-    "aliases": ["nvidia geforce rtx 4090", "rtx 4090"],
+    "aliases": ["nvidia geforce rtx 4090", "rtx 4090", "geforce rtx 4090"],
     "score": 100,
     "vramGb": 24
+  },
+  {
+    "name": "NVIDIA GeForce RTX 5090",
+    "aliases": ["nvidia geforce rtx 5090", "rtx 5090", "geforce rtx 5090"],
+    "score": 130,
+    "vramGb": 32
   }
 ]

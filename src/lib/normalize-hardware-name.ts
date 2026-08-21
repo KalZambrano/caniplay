@@ -3,8 +3,12 @@ const NOISE_PATTERNS: RegExp[] = [
   /\(tm\)/gi,
   /[®™]/g,
   /\bor (better|newer|higher|greater|equivalent|comparable)\b/gi,
-  /\bcpu\b/gi,
+  /\b(cpu|gpu|vga|apu)\b/gi,
+  /\b(processor|procesador|graphics card|video card|graphics adapter|tarjeta (de )?v[ií]deo)\b/gi,
   /@\s?[\d.]+\s?ghz/gi,
+  // "i7-8700K", "i7 8700K" y "i7/8700K" nombran el mismo chip: los separadores
+  // internos no aportan nada al match y sí provocaban fallos por puntuación.
+  /[-_/]+/g,
   /\s{2,}/g,
 ]
 
