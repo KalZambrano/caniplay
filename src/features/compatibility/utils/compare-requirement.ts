@@ -24,14 +24,18 @@ export function compareRam(
 ): ComponentVerdict {
   const required = requirement.ramGb
   const detected = hardware.ramGb
+  const detectedLabel = formatRam(detected, hardware.ramConfidence)
   const requirementLabel = required !== null ? `${required} GB` : 'No especificado'
+  // El navegador solo da un piso; si la persona eligió su RAM a mano, el
+  // número es exacto y quedarse corto es un fallo, no una duda.
+  const isBrowserEstimate = hardware.ramConfidence === 'estimated'
 
   if (required === null) {
     return {
       component: 'ram',
       status: 'unknown',
       requirementLabel,
-      detectedLabel: detected !== null ? formatRam(detected) : 'No detectada',
+      detectedLabel: detected !== null ? detectedLabel : 'No detectada',
     }
   }
 
@@ -44,16 +48,18 @@ export function compareRam(
       component: 'ram',
       status: 'pass',
       requirementLabel,
-      detectedLabel: formatRam(detected),
+      detectedLabel,
     }
   }
 
   return {
     component: 'ram',
-    status: 'warn',
+    status: isBrowserEstimate ? 'warn' : 'fail',
     requirementLabel,
-    detectedLabel: formatRam(detected),
-    note: 'Estimación mínima del navegador — tu RAM real podría ser mayor.',
+    detectedLabel,
+    note: isBrowserEstimate
+      ? 'Estimación mínima del navegador — tu RAM real podría ser mayor.'
+      : undefined,
   }
 }
 

@@ -1,12 +1,25 @@
 import { Cpu, MemoryStick, MonitorCog, Layers } from 'lucide-react'
 import { Combobox } from '@/components/ui/combobox'
+import { Select } from '@/components/ui/select'
 import { useHardwareContext } from '../context/hardware-context'
 import { SpecPill } from './spec-pill'
 import { formatCores, formatRam, formatVram } from '../utils/format-hardware'
 import { CPU_MODEL_OPTIONS } from '../utils/cpu-options'
+import { RAM_GB_OPTIONS, toRamOption } from '../utils/ram-options'
 
 export function HardwareScanPanel() {
-  const { hardware, status, setCpuModel } = useHardwareContext()
+  const { hardware, status, detectedRamGb, setCpuModel, setRamGb } = useHardwareContext()
+  // Con valor vacío el select apunta a la fila «detectado»: así lo escaneado
+  // sigue siendo una opción a la que volver después de haberlo cambiado.
+  const isRamManual = hardware.ramConfidence === 'measured'
+  const ramValue = isRamManual ? String(toRamOption(hardware.ramGb) ?? '') : ''
+  // La fila de lo detectado se etiqueta como se leía antes la píldora —
+  // «≥ 8 GB *»: el piso del navegador y su asterisco viajan dentro de la
+  // opción, así que al elegir una capacidad concreta desaparecen solos.
+  const detectedRamLabel =
+    detectedRamGb !== null
+      ? `${formatRam(toRamOption(detectedRamGb), 'estimated')} *`
+      : 'Sin detectar'
   const isScanning = status === 'scanning'
 
   return (
@@ -45,8 +58,27 @@ export function HardwareScanPanel() {
         <SpecPill
           icon={<MemoryStick className="size-4" />}
           label="RAM"
-          value={formatRam(hardware.ramGb)}
           confidence={hardware.ramConfidence}
+          control={
+            <Select
+              aria-label="RAM instalada"
+              title="El navegador solo detecta un mínimo — ajústalo a tu RAM real."
+              value={ramValue}
+              onChange={(event) => setRamGb(event.target.value ? Number(event.target.value) : null)}
+              containerClassName="w-auto min-w-0 max-w-full"
+              // Fondo explícito: el desplegable nativo hereda el del campo, y
+              // en transparente el navegador lo pinta en blanco.
+              className="h-6 w-auto max-w-full cursor-pointer rounded-sm border-none bg-bg-elevated pl-0 pr-6 font-mono text-sm text-text"
+            >
+              <option value="">{detectedRamLabel}</option>
+              <option disabled>──────────</option>
+              {RAM_GB_OPTIONS.map((option) => (
+                <option key={option} value={option}>
+                  {option} GB
+                </option>
+              ))}
+            </Select>
+          }
         />
         <SpecPill
           icon={<Cpu className="size-4" />}
