@@ -1,4 +1,5 @@
 import {
+  Fragment,
   useCallback,
   useEffect,
   useId,
@@ -17,6 +18,8 @@ import { Input } from './input'
 export interface ComboboxOption {
   value: string
   label: string
+  /** Encabezado bajo el que se agrupa la opción. Sin valor, va suelta. */
+  group?: string
 }
 
 interface ComboboxProps {
@@ -60,7 +63,7 @@ export function Combobox({
 
   const listboxId = useId()
   const containerRef = useRef<HTMLDivElement>(null)
-  const listRef = useRef<HTMLUListElement>(null)
+  const listRef = useRef<HTMLDivElement>(null)
 
   const selectedLabel = options.find((option) => option.value === value)?.label ?? ''
 
@@ -69,6 +72,34 @@ export function Combobox({
     if (!target) return options
     return options.filter((option) => normalizeSearchText(option.label).includes(target))
   }, [options, query])
+
+  /**
+   * Agrupa por `group` respetando el orden en que cada grupo aparece por
+   * primera vez, y numera las opciones de corrido: ese índice es el que usa el
+   * teclado, así que sigue coincidiendo con el orden visual aunque agrupar
+   * reordene la lista.
+   */
+  const groups = useMemo(() => {
+    const buckets = new Map<string, ComboboxOption[]>()
+
+    for (const option of filteredOptions) {
+      const key = option.group ?? ''
+      const bucket = buckets.get(key)
+      if (bucket) bucket.push(option)
+      else buckets.set(key, [option])
+    }
+
+    let index = 0
+    return Array.from(buckets, ([label, groupOptions]) => ({
+      label,
+      entries: groupOptions.map((option) => ({ option, index: index++ })),
+    }))
+  }, [filteredOptions])
+
+  const visibleOptions = useMemo(
+    () => groups.flatMap((group) => group.entries.map((entry) => entry.option)),
+    [groups],
+  )
 
   /**
    * Abre hacia arriba cuando no cabe abajo, y recorta la altura a lo que
@@ -96,7 +127,7 @@ export function Combobox({
   useLayoutEffect(() => {
     if (!isOpen) return
     updatePosition()
-  }, [isOpen, updatePosition, filteredOptions.length])
+  }, [isOpen, updatePosition, visibleOptions.length])
 
   useEffect(() => {
     if (!isOpen) return
@@ -135,7 +166,7 @@ export function Combobox({
   }, [activeIndex, isOpen])
 
   function openList() {
-    const selectedIndex = filteredOptions.findIndex((option) => option.value === value)
+    const selectedIndex = visibleOptions.findIndex((option) => option.value === value)
     setActiveIndex(selectedIndex >= 0 ? selectedIndex : 0)
     setIsOpen(true)
   }
@@ -167,11 +198,11 @@ export function Combobox({
         openList()
         return
       }
-      if (filteredOptions.length === 0) return
+      if (visibleOptions.length === 0) return
 
       const delta = event.key === 'ArrowDown' ? 1 : -1
       setActiveIndex(
-        (previous) => (previous + delta + filteredOptions.length) % filteredOptions.length,
+        (previous) => (previous + delta + visibleOptions.length) % visibleOptions.length,
       )
       return
     }
@@ -184,16 +215,43 @@ export function Combobox({
 
     if (event.key === 'End' && isOpen) {
       event.preventDefault()
-      setActiveIndex(Math.max(0, filteredOptions.length - 1))
+      setActiveIndex(Math.max(0, visibleOptions.length - 1))
       return
     }
 
     if (event.key === 'Enter' && isOpen) {
-      const option = filteredOptions[activeIndex]
+      const option = visibleOptions[activeIndex]
       if (!option) return
       event.preventDefault()
       selectOption(option)
     }
+  }
+
+  function renderOption(option: ComboboxOption, index: number) {
+    const isSelected = option.value === value
+    const isActive = index === activeIndex
+
+    return (
+      <div
+        key={option.value}
+        id={`${listboxId}-option-${index}`}
+        role="option"
+        aria-selected={isSelected}
+        data-index={index}
+        // El foco se queda en el input (patrón aria-activedescendant),
+        // así que el puntero mueve la opción activa en vez de competir
+        // con un estado :hover aparte.
+        onMouseEnter={() => setActiveIndex(index)}
+        onClick={() => selectOption(option)}
+        className={cn(
+          'cursor-pointer px-3 py-2 text-sm',
+          isActive && 'bg-bg-elevated',
+          isSelected ? 'font-medium text-brand-strong' : 'text-text',
+        )}
+      >
+        {option.label}
+      </div>
+    )
   }
 
   return (
@@ -210,9 +268,7 @@ export function Combobox({
           aria-controls={listboxId}
           aria-autocomplete="list"
           aria-activedescendant={
-            isOpen && filteredOptions[activeIndex]
-              ? `${listboxId}-option-${activeIndex}`
-              : undefined
+            isOpen && visibleOptions[activeIndex] ? `${listboxId}-option-${activeIndex}` : undefined
           }
           autoComplete="off"
           value={isOpen ? query : selectedLabel}
@@ -239,7 +295,7 @@ export function Combobox({
 
       {isOpen &&
         createPortal(
-          <ul
+          <div
             ref={listRef}
             id={listboxId}
             role="listbox"
@@ -251,37 +307,38 @@ export function Combobox({
             }}
             className="fixed z-50 overflow-auto rounded-md border border-border-strong bg-bg-inset py-1 shadow-lg shadow-black/40"
           >
-            {filteredOptions.length === 0 ? (
-              <li className="px-3 py-2 text-sm text-text-faint">{emptyMessage}</li>
+            {visibleOptions.length === 0 ? (
+              <div className="px-3 py-2 text-sm text-text-faint">{emptyMessage}</div>
             ) : (
-              filteredOptions.map((option, index) => {
-                const isSelected = option.value === value
-                const isActive = index === activeIndex
+              groups.map((group, groupIndex) => {
+                // Sin `group` no hay encabezado que mostrar: esas opciones van
+                // sueltas y la lista se ve igual que antes de agrupar.
+                if (!group.label) {
+                  return (
+                    <Fragment key={`ungrouped-${groupIndex}`}>
+                      {group.entries.map((entry) => renderOption(entry.option, entry.index))}
+                    </Fragment>
+                  )
+                }
+
+                const headingId = `${listboxId}-group-${groupIndex}`
 
                 return (
-                  <li
-                    key={option.value}
-                    id={`${listboxId}-option-${index}`}
-                    role="option"
-                    aria-selected={isSelected}
-                    data-index={index}
-                    // El foco se queda en el input (patrón aria-activedescendant),
-                    // así que el puntero mueve la opción activa en vez de competir
-                    // con un estado :hover aparte.
-                    onMouseEnter={() => setActiveIndex(index)}
-                    onClick={() => selectOption(option)}
-                    className={cn(
-                      'cursor-pointer px-3 py-2 text-sm',
-                      isActive && 'bg-bg-elevated',
-                      isSelected ? 'font-medium text-brand-strong' : 'text-text',
-                    )}
-                  >
-                    {option.label}
-                  </li>
+                  <div key={group.label} role="group" aria-labelledby={headingId}>
+                    <div
+                      id={headingId}
+                      // Pegado arriba para que al hacer scroll siempre se vea a
+                      // qué grupo pertenece lo que estás mirando.
+                      className="sticky top-0 z-10 bg-bg-inset px-3 py-1.5 font-mono text-[0.65rem] uppercase tracking-widest text-text-faint"
+                    >
+                      {group.label}
+                    </div>
+                    {group.entries.map((entry) => renderOption(entry.option, entry.index))}
+                  </div>
                 )
               })
             )}
-          </ul>,
+          </div>,
           document.body,
         )}
     </div>
