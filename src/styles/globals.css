@@ -35,6 +35,10 @@
   --color-unknown: #7c8a94;
   --color-unknown-muted: #1c242a;
 
+  /* Steam's header capsule ratio (460x215) — the only image ratio the app uses,
+     so cards and the detail hero stay identical instead of drifting apart. */
+  --aspect-header: 460 / 215;
+
   --font-display: 'Chakra Petch', ui-sans-serif, system-ui, sans-serif;
   --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
@@ -66,6 +70,18 @@
   h4 {
     font-family: var(--font-display);
     letter-spacing: 0.01em;
+  }
+
+  /* El desplegable nativo de un <select> se pinta con el fondo del propio
+     campo, así que las opciones llevan color explícito: sin esto, un campo
+     transparente o de fondo heredado sale en blanco sobre el tema oscuro. */
+  option {
+    background-color: var(--color-bg-inset);
+    color: var(--color-text);
+  }
+
+  option:disabled {
+    color: var(--color-text-faint);
   }
 
   ::selection {

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { usePageTitle } from '@/hooks/use-page-title'
 
 export function NotFoundPage() {
-  usePageTitle('Página no encontrada — RigScan')
+  usePageTitle('Página no encontrada — CanIPlay')
 
   return (
     <div className="flex flex-col items-center gap-4 py-24 text-center">

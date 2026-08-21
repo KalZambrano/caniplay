@@ -1,87 +1,422 @@
 [
   {
-    "name": "Intel Pentium G4560",
-    "aliases": ["intel pentium g4560", "pentium g4560"],
-    "score": 16
+    "name": "Intel Core 2 Duo E8400",
+    "aliases": ["intel core 2 duo e8400", "2 duo e8400", "core 2 duo e8400"],
+    "score": 6,
+    "baseClockGhz": 3
   },
   {
-    "name": "Intel Core i3-4130",
-    "aliases": ["intel core i3-4130", "i3-4130"],
-    "score": 20
+    "name": "AMD Phenom II X4 965",
+    "aliases": ["amd phenom ii x4 965", "phenom ii x4 965"],
+    "score": 10,
+    "baseClockGhz": 3.4
+  },
+  {
+    "name": "Intel Core i3-2100",
+    "aliases": ["intel core i3-2100", "i3-2100", "core i3-2100"],
+    "score": 12,
+    "baseClockGhz": 3.1
+  },
+  {
+    "name": "Qualcomm Snapdragon 8cx",
+    "aliases": ["qualcomm snapdragon 8cx", "snapdragon 8cx"],
+    "score": 14,
+    "baseClockGhz": 2.84
+  },
+  {
+    "name": "AMD FX-6300",
+    "aliases": ["amd fx-6300", "fx-6300"],
+    "score": 16,
+    "baseClockGhz": 3.5
+  },
+  {
+    "name": "Intel Pentium G4560",
+    "aliases": ["intel pentium g4560", "pentium g4560"],
+    "score": 16,
+    "baseClockGhz": 3.5
   },
   {
     "name": "AMD FX-8310",
     "aliases": ["amd fx-8310", "fx-8310"],
-    "score": 18
+    "score": 18,
+    "baseClockGhz": 3.4
+  },
+  {
+    "name": "AMD FX-8350",
+    "aliases": ["amd fx-8350", "fx-8350"],
+    "score": 19,
+    "baseClockGhz": 4
+  },
+  {
+    "name": "Intel Core i3-4130",
+    "aliases": ["intel core i3-4130", "i3-4130", "core i3-4130"],
+    "score": 20,
+    "baseClockGhz": 3.4
+  },
+  {
+    "name": "Intel Core i5-2500K",
+    "aliases": ["intel core i5-2500k", "i5-2500k", "core i5-2500k"],
+    "score": 22,
+    "baseClockGhz": 3.3
+  },
+  {
+    "name": "Intel Core i7-2600K",
+    "aliases": ["intel core i7-2600k", "i7-2600k", "core i7-2600k"],
+    "score": 24,
+    "baseClockGhz": 3.4
+  },
+  {
+    "name": "AMD Ryzen 3 1200",
+    "aliases": ["amd ryzen 3 1200", "ryzen 3 1200"],
+    "score": 25,
+    "baseClockGhz": 3.1
   },
   {
     "name": "Intel Core i5-3570K",
-    "aliases": ["intel core i5-3570k", "i5-3570k"],
-    "score": 26
+    "aliases": ["intel core i5-3570k", "i5-3570k", "core i5-3570k"],
+    "score": 26,
+    "baseClockGhz": 3.4
+  },
+  {
+    "name": "Intel Core i5-4460",
+    "aliases": ["intel core i5-4460", "i5-4460", "core i5-4460"],
+    "score": 27,
+    "baseClockGhz": 3.2
+  },
+  {
+    "name": "Intel Core i5-4590",
+    "aliases": ["intel core i5-4590", "i5-4590", "core i5-4590"],
+    "score": 28,
+    "baseClockGhz": 3.3
+  },
+  {
+    "name": "Intel Core i7-3770",
+    "aliases": ["intel core i7-3770", "i7-3770", "core i7-3770"],
+    "score": 28,
+    "baseClockGhz": 3.4
+  },
+  {
+    "name": "AMD Ryzen 5 1500X",
+    "aliases": ["amd ryzen 5 1500x", "ryzen 5 1500x"],
+    "score": 30,
+    "baseClockGhz": 3.5
   },
   {
     "name": "Intel Core i3-8100",
-    "aliases": ["intel core i3-8100", "i3-8100"],
-    "score": 30
+    "aliases": ["intel core i3-8100", "i3-8100", "core i3-8100"],
+    "score": 30,
+    "baseClockGhz": 3.6
+  },
+  {
+    "name": "Intel Core i5-6600K",
+    "aliases": ["intel core i5-6600k", "i5-6600k", "core i5-6600k"],
+    "score": 31,
+    "baseClockGhz": 3.5
+  },
+  {
+    "name": "Intel Core i5-7500",
+    "aliases": ["intel core i5-7500", "i5-7500", "core i5-7500"],
+    "score": 32,
+    "baseClockGhz": 3.4
+  },
+  {
+    "name": "Intel Core i7-4770K",
+    "aliases": ["intel core i7-4770k", "i7-4770k", "core i7-4770k"],
+    "score": 32,
+    "baseClockGhz": 3.5
   },
   {
     "name": "AMD Ryzen 5 1600",
     "aliases": ["amd ryzen 5 1600", "ryzen 5 1600"],
-    "score": 34
+    "score": 34,
+    "baseClockGhz": 3.2
+  },
+  {
+    "name": "Intel Core i7-4790K",
+    "aliases": ["intel core i7-4790k", "i7-4790k", "core i7-4790k"],
+    "score": 35,
+    "baseClockGhz": 4
+  },
+  {
+    "name": "AMD Ryzen 5 2600",
+    "aliases": ["amd ryzen 5 2600", "ryzen 5 2600"],
+    "score": 38,
+    "baseClockGhz": 3.4
+  },
+  {
+    "name": "AMD Ryzen 7 1700",
+    "aliases": ["amd ryzen 7 1700", "ryzen 7 1700"],
+    "score": 40,
+    "baseClockGhz": 3
+  },
+  {
+    "name": "Apple M1",
+    "aliases": ["apple m1", "m1"],
+    "score": 40,
+    "baseClockGhz": 3.2
   },
   {
     "name": "Intel Core i7-6700",
-    "aliases": ["intel core i7-6700", "i7-6700"],
-    "score": 40
+    "aliases": ["intel core i7-6700", "i7-6700", "core i7-6700"],
+    "score": 40,
+    "baseClockGhz": 3.4
+  },
+  {
+    "name": "AMD Ryzen 5 2600X",
+    "aliases": ["amd ryzen 5 2600x", "ryzen 5 2600x"],
+    "score": 41,
+    "baseClockGhz": 3.6
+  },
+  {
+    "name": "Intel Core i7-6700K",
+    "aliases": ["intel core i7-6700k", "i7-6700k", "core i7-6700k"],
+    "score": 41,
+    "baseClockGhz": 4
   },
   {
     "name": "Intel Core i5-8400",
-    "aliases": ["intel core i5-8400", "i5-8400"],
-    "score": 42
+    "aliases": ["intel core i5-8400", "i5-8400", "core i5-8400"],
+    "score": 42,
+    "baseClockGhz": 2.8
+  },
+  {
+    "name": "Intel Core i5-9400F",
+    "aliases": ["intel core i5-9400f", "i5-9400f", "core i5-9400f"],
+    "score": 43,
+    "baseClockGhz": 2.9
+  },
+  {
+    "name": "Intel Core i7-7700K",
+    "aliases": ["intel core i7-7700k", "i7-7700k", "core i7-7700k"],
+    "score": 44,
+    "baseClockGhz": 4.2
+  },
+  {
+    "name": "AMD Ryzen 7 2700X",
+    "aliases": ["amd ryzen 7 2700x", "ryzen 7 2700x"],
+    "score": 45,
+    "baseClockGhz": 3.7
+  },
+  {
+    "name": "Intel Core i5-9600K",
+    "aliases": ["intel core i5-9600k", "i5-9600k", "core i5-9600k"],
+    "score": 46,
+    "baseClockGhz": 3.7
   },
   {
     "name": "AMD Ryzen 5 3600",
     "aliases": ["amd ryzen 5 3600", "ryzen 5 3600"],
-    "score": 48
+    "score": 48,
+    "baseClockGhz": 3.6
+  },
+  {
+    "name": "Apple M2",
+    "aliases": ["apple m2", "m2"],
+    "score": 48,
+    "baseClockGhz": 3.5
   },
   {
     "name": "AMD Ryzen 5 3600X",
     "aliases": ["amd ryzen 5 3600x", "ryzen 5 3600x"],
-    "score": 50
+    "score": 50,
+    "baseClockGhz": 3.8
   },
   {
     "name": "Intel Core i7-8700K",
-    "aliases": ["intel core i7-8700k", "i7-8700k"],
-    "score": 52
+    "aliases": ["intel core i7-8700k", "i7-8700k", "core i7-8700k"],
+    "score": 52,
+    "baseClockGhz": 3.7
+  },
+  {
+    "name": "Apple M3",
+    "aliases": ["apple m3", "m3"],
+    "score": 54,
+    "baseClockGhz": 4.05
+  },
+  {
+    "name": "Intel Core i7-9700K",
+    "aliases": ["intel core i7-9700k", "i7-9700k", "core i7-9700k"],
+    "score": 54,
+    "baseClockGhz": 3.6
   },
   {
     "name": "AMD Ryzen 7 3700X",
     "aliases": ["amd ryzen 7 3700x", "ryzen 7 3700x"],
-    "score": 56
+    "score": 56,
+    "baseClockGhz": 3.6
+  },
+  {
+    "name": "AMD Ryzen 7 3800X",
+    "aliases": ["amd ryzen 7 3800x", "ryzen 7 3800x"],
+    "score": 58,
+    "baseClockGhz": 3.9
   },
   {
     "name": "Intel Core i9-9900K",
-    "aliases": ["intel core i9-9900k", "i9-9900k"],
-    "score": 58
+    "aliases": ["intel core i9-9900k", "i9-9900k", "core i9-9900k"],
+    "score": 58,
+    "baseClockGhz": 3.6
+  },
+  {
+    "name": "Intel Core i5-11400",
+    "aliases": ["intel core i5-11400", "i5-11400", "core i5-11400"],
+    "score": 59,
+    "baseClockGhz": 2.6
   },
   {
     "name": "Intel Core i5-12400",
-    "aliases": ["intel core i5-12400", "i5-12400"],
-    "score": 60
+    "aliases": ["intel core i5-12400", "i5-12400", "core i5-12400"],
+    "score": 60,
+    "baseClockGhz": 2.5
+  },
+  {
+    "name": "AMD Ryzen 5 5600",
+    "aliases": ["amd ryzen 5 5600", "ryzen 5 5600"],
+    "score": 61,
+    "baseClockGhz": 3.5
+  },
+  {
+    "name": "Intel Core i7-10700K",
+    "aliases": ["intel core i7-10700k", "i7-10700k", "core i7-10700k"],
+    "score": 61,
+    "baseClockGhz": 3.8
   },
   {
     "name": "AMD Ryzen 5 5600X",
     "aliases": ["amd ryzen 5 5600x", "ryzen 5 5600x"],
-    "score": 62
+    "score": 62,
+    "baseClockGhz": 3.7
+  },
+  {
+    "name": "AMD Ryzen 9 3900X",
+    "aliases": ["amd ryzen 9 3900x", "ryzen 9 3900x"],
+    "score": 64,
+    "baseClockGhz": 3.8
+  },
+  {
+    "name": "Intel Core i9-10900K",
+    "aliases": ["intel core i9-10900k", "i9-10900k", "core i9-10900k"],
+    "score": 65,
+    "baseClockGhz": 3.7
+  },
+  {
+    "name": "AMD Ryzen 7 5700X",
+    "aliases": ["amd ryzen 7 5700x", "ryzen 7 5700x"],
+    "score": 66,
+    "baseClockGhz": 3.4
+  },
+  {
+    "name": "Intel Core i7-11700K",
+    "aliases": ["intel core i7-11700k", "i7-11700k", "core i7-11700k"],
+    "score": 66,
+    "baseClockGhz": 3.6
+  },
+  {
+    "name": "Intel Core i5-13400",
+    "aliases": ["intel core i5-13400", "i5-13400", "core i5-13400"],
+    "score": 67,
+    "baseClockGhz": 2.5
+  },
+  {
+    "name": "AMD Ryzen 7 5800X",
+    "aliases": ["amd ryzen 7 5800x", "ryzen 7 5800x"],
+    "score": 68,
+    "baseClockGhz": 3.8
+  },
+  {
+    "name": "AMD Ryzen 5 7600X",
+    "aliases": ["amd ryzen 5 7600x", "ryzen 5 7600x"],
+    "score": 69,
+    "baseClockGhz": 4.7
   },
   {
     "name": "Intel Core i7-12700K",
-    "aliases": ["intel core i7-12700k", "i7-12700k"],
-    "score": 70
+    "aliases": ["intel core i7-12700k", "i7-12700k", "core i7-12700k"],
+    "score": 70,
+    "baseClockGhz": 3.6
+  },
+  {
+    "name": "AMD Ryzen 7 5800X3D",
+    "aliases": ["amd ryzen 7 5800x3d", "ryzen 7 5800x3d"],
+    "score": 71,
+    "baseClockGhz": 3.4
   },
   {
     "name": "AMD Ryzen 9 5900X",
     "aliases": ["amd ryzen 9 5900x", "ryzen 9 5900x"],
-    "score": 72
+    "score": 72,
+    "baseClockGhz": 3.7
+  },
+  {
+    "name": "Intel Core i5-13600K",
+    "aliases": ["intel core i5-13600k", "i5-13600k", "core i5-13600k"],
+    "score": 74,
+    "baseClockGhz": 3.5
+  },
+  {
+    "name": "AMD Ryzen 7 7700X",
+    "aliases": ["amd ryzen 7 7700x", "ryzen 7 7700x"],
+    "score": 76,
+    "baseClockGhz": 4.5
+  },
+  {
+    "name": "Intel Core i5-14600K",
+    "aliases": ["intel core i5-14600k", "i5-14600k", "core i5-14600k"],
+    "score": 76,
+    "baseClockGhz": 3.5
+  },
+  {
+    "name": "Intel Core i9-12900K",
+    "aliases": ["intel core i9-12900k", "i9-12900k", "core i9-12900k"],
+    "score": 78,
+    "baseClockGhz": 3.2
+  },
+  {
+    "name": "AMD Ryzen 7 7800X3D",
+    "aliases": ["amd ryzen 7 7800x3d", "ryzen 7 7800x3d"],
+    "score": 82,
+    "baseClockGhz": 4.2
+  },
+  {
+    "name": "Intel Core i7-13700K",
+    "aliases": ["intel core i7-13700k", "i7-13700k", "core i7-13700k"],
+    "score": 82,
+    "baseClockGhz": 3.4
+  },
+  {
+    "name": "AMD Ryzen 9 7900X",
+    "aliases": ["amd ryzen 9 7900x", "ryzen 9 7900x"],
+    "score": 84,
+    "baseClockGhz": 4.7
+  },
+  {
+    "name": "AMD Ryzen 9 7950X",
+    "aliases": ["amd ryzen 9 7950x", "ryzen 9 7950x"],
+    "score": 90,
+    "baseClockGhz": 4.5
+  },
+  {
+    "name": "Intel Core i9-13900K",
+    "aliases": ["intel core i9-13900k", "i9-13900k", "core i9-13900k"],
+    "score": 90,
+    "baseClockGhz": 3
+  },
+  {
+    "name": "Intel Core i9-14900K",
+    "aliases": ["intel core i9-14900k", "i9-14900k", "core i9-14900k"],
+    "score": 92,
+    "baseClockGhz": 3.2
+  },
+  {
+    "name": "AMD Ryzen 7 9800X3D",
+    "aliases": ["amd ryzen 7 9800x3d", "ryzen 7 9800x3d"],
+    "score": 94,
+    "baseClockGhz": 4.7
+  },
+  {
+    "name": "AMD Ryzen 9 9950X",
+    "aliases": ["amd ryzen 9 9950x", "ryzen 9 9950x"],
+    "score": 96,
+    "baseClockGhz": 4.3
   }
 ]

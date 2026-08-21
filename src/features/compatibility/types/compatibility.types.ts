@@ -38,3 +38,8 @@ export interface BenchmarkEntry {
 export interface GpuBenchmarkEntry extends BenchmarkEntry {
   vramGb: number
 }
+
+export interface CpuBenchmarkEntry extends BenchmarkEntry {
+  /** Base clock in GHz — used only for the generic-spec heuristic (e.g. "Dual core at 2.8 GHz"), not the name-match comparison. */
+  baseClockGhz: number
+}
