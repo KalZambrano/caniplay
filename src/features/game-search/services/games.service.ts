@@ -67,12 +67,16 @@ export async function getFeaturedGames(): Promise<GameSearchResult[]> {
     return typedMockGames.map(toSummary)
   }
 
-  const response = await fetch(new URL('/featured', env.apiBaseUrl))
-  if (!response.ok) {
-    throw new Error('No se pudieron cargar los juegos destacados')
-  }
+  // El backend todavía no implementa `/featured`, así que contra la API real no
+  // se pide nada y la home simplemente no muestra destacados.
+  return []
 
-  return response.json() as Promise<GameSearchResult[]>
+  // const response = await fetch(new URL('/featured', env.apiBaseUrl))
+  // if (!response.ok) {
+  //   throw new Error('No se pudieron cargar los juegos destacados')
+  // }
+  //
+  // return response.json() as Promise<GameSearchResult[]>
 }
 
 async function getGameByIdMock(id: string): Promise<GameDetail | null> {
