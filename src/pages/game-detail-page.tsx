@@ -58,7 +58,7 @@ export function GameDetailPage() {
     )
   }
 
-  const pageUrl = typeof window !== 'undefined' ? window.location.href : `https://caniplay.app/juego/${game.id}`
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : `https://caniplay.vercel.app/juego/${game.id}`
   const description = game.shortDescription
     ? game.shortDescription.slice(0, 160)
     : `Comprueba si tu PC puede correr ${game.name}. CanIPlay detecta tu hardware y compara con los requisitos.`

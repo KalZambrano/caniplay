@@ -23,7 +23,7 @@ export function HomePage() {
           name="description"
           content="CanIPlay detecta el hardware de tu PC en el navegador y verifica si cumple los requisitos mínimos o recomendados de cualquier juego."
         />
-        <link rel="canonical" href="https://caniplay.app/" />
+        <link rel="canonical" href="https://caniplay.vercel.app/" />
         <meta property="og:type" content="website" />
         <meta property="og:locale" content="es_ES" />
         <meta property="og:title" content="CanIPlay — ¿Tu equipo puede correrlo?" />
@@ -31,7 +31,7 @@ export function HomePage() {
           property="og:description"
           content="CanIPlay detecta el hardware de tu PC en el navegador y verifica si cumple los requisitos mínimos o recomendados de cualquier juego."
         />
-        <meta property="og:url" content="https://caniplay.app/" />
+        <meta property="og:url" content="https://caniplay.vercel.app/" />
         <meta property="og:site_name" content="CanIPlay" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="CanIPlay — ¿Tu equipo puede correrlo?" />

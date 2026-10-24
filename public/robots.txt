@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://caniplay.app/sitemap.xml
+Sitemap: https://caniplay.vercel.app/sitemap.xml
