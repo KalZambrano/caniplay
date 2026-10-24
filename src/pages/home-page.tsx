@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async'
 import { HardwareScanPanel } from '@/features/hardware-detection/components/hardware-scan-panel'
 import { SearchBar } from '@/features/game-search/components/search-bar'
 import { GameResultsGrid } from '@/features/game-search/components/game-results-grid'
@@ -16,6 +17,29 @@ export function HomePage() {
 
   return (
     <div className="flex flex-col gap-12">
+      <Helmet>
+        <title>CanIPlay — ¿Tu equipo puede correrlo?</title>
+        <meta
+          name="description"
+          content="CanIPlay detecta el hardware de tu PC en el navegador y verifica si cumple los requisitos mínimos o recomendados de cualquier juego."
+        />
+        <link rel="canonical" href="https://caniplay.app/" />
+        <meta property="og:type" content="website" />
+        <meta property="og:locale" content="es_ES" />
+        <meta property="og:title" content="CanIPlay — ¿Tu equipo puede correrlo?" />
+        <meta
+          property="og:description"
+          content="CanIPlay detecta el hardware de tu PC en el navegador y verifica si cumple los requisitos mínimos o recomendados de cualquier juego."
+        />
+        <meta property="og:url" content="https://caniplay.app/" />
+        <meta property="og:site_name" content="CanIPlay" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="CanIPlay — ¿Tu equipo puede correrlo?" />
+        <meta
+          name="twitter:description"
+          content="CanIPlay detecta el hardware de tu PC en el navegador y verifica si cumple los requisitos mínimos o recomendados de cualquier juego."
+        />
+      </Helmet>
       <section className="flex flex-col gap-8">
         <div className="mx-auto max-w-2xl text-center">
           <h1 className="font-display text-4xl font-bold leading-tight text-text sm:text-5xl">
