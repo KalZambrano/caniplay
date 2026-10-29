@@ -10,6 +10,7 @@ interface SearchBarProps {
 export function SearchBar({ value, onChange, className }: SearchBarProps) {
   return (
     <div
+      role="search"
       className={cn(
         'flex h-14 items-center gap-3 rounded-lg border border-border-strong bg-bg-inset px-4',
         'focus-within:ring-2 focus-within:ring-brand',

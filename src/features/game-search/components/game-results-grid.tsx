@@ -15,7 +15,11 @@ export function GameResultsGrid({ query, results, status, errorMessage }: GameRe
 
   if (status === 'loading') {
     return (
-      <div className="flex items-center justify-center gap-2 py-12 text-text-muted">
+      <div
+        className="flex items-center justify-center gap-2 py-12 text-text-muted"
+        aria-live="polite"
+        aria-busy="true"
+      >
         <Spinner />
         <span className="text-sm">Buscando «{query}»…</span>
       </div>
@@ -24,7 +28,11 @@ export function GameResultsGrid({ query, results, status, errorMessage }: GameRe
 
   if (status === 'error') {
     return (
-      <p className="rounded-md border border-bad/40 bg-bad-muted px-4 py-3 text-sm text-bad">
+      <p
+        className="rounded-md border border-bad/40 bg-bad-muted px-4 py-3 text-sm text-bad"
+        role="alert"
+        aria-live="assertive"
+      >
         {errorMessage ?? 'No se pudo completar la búsqueda.'}
       </p>
     )
@@ -32,14 +40,18 @@ export function GameResultsGrid({ query, results, status, errorMessage }: GameRe
 
   if (results.length === 0) {
     return (
-      <p className="py-12 text-center text-sm text-text-muted">
+      <p className="py-12 text-center text-sm text-text-muted" aria-live="polite">
         No encontramos juegos que coincidan con «{query}».
       </p>
     )
   }
 
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+    <div
+      className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4"
+      aria-live="polite"
+      aria-label="Resultados de búsqueda"
+    >
       {results.map((game) => (
         <GameCard key={game.id} game={game} />
       ))}

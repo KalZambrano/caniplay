@@ -1,4 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import { ArrowLeft, Gamepad2 } from 'lucide-react'
 import { Spinner } from '@/components/ui/spinner'
 import { Button } from '@/components/ui/button'
@@ -21,7 +22,11 @@ export function GameDetailPage() {
 
   if (status === 'loading') {
     return (
-      <div className="flex items-center justify-center gap-2 py-24 text-text-muted">
+      <div
+        className="flex items-center justify-center gap-2 py-24 text-text-muted"
+        aria-live="polite"
+        aria-busy="true"
+      >
         <Spinner />
         <span className="text-sm">Cargando juego…</span>
       </div>
@@ -30,10 +35,10 @@ export function GameDetailPage() {
 
   if (status === 'not-found') {
     return (
-      <div className="py-24 text-center">
+      <div className="py-24 text-center" role="alert" aria-live="polite">
         <p className="text-text-muted">No encontramos ese juego.</p>
         <Link to="/" className="mt-4 inline-block">
-          <Button variant="secondary" icon={<ArrowLeft className="size-4" />}>
+          <Button variant="secondary" icon={<ArrowLeft className="size-4" aria-hidden />}>
             Volver a buscar
           </Button>
         </Link>
@@ -43,14 +48,54 @@ export function GameDetailPage() {
 
   if (status === 'error' || !game || !report) {
     return (
-      <p className="rounded-md border border-bad/40 bg-bad-muted px-4 py-3 text-sm text-bad">
+      <p
+        className="rounded-md border border-bad/40 bg-bad-muted px-4 py-3 text-sm text-bad"
+        role="alert"
+        aria-live="assertive"
+      >
         {errorMessage ?? 'No se pudo cargar este juego.'}
       </p>
     )
   }
 
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : `https://caniplay.vercel.app/juego/${game.id}`
+  const description = game.shortDescription
+    ? game.shortDescription.slice(0, 160)
+    : `Comprueba si tu PC puede correr ${game.name}. CanIPlay detecta tu hardware y compara con los requisitos.`
+
   return (
     <div className="flex flex-col gap-6">
+      <Helmet>
+        <title>{`${game.name} — CanIPlay`}</title>
+        <meta name="description" content={description} />
+        <link rel="canonical" href={pageUrl} />
+        <meta property="og:type" content="article" />
+        <meta property="og:locale" content="es_ES" />
+        <meta property="og:title" content={`${game.name} — CanIPlay`} />
+        <meta property="og:description" content={description} />
+        <meta property="og:url" content={pageUrl} />
+        <meta property="og:site_name" content="CanIPlay" />
+        {game.headerImage && <meta property="og:image" content={game.headerImage} />}
+        <meta name="twitter:card" content={game.headerImage ? 'summary_large_image' : 'summary'} />
+        <meta name="twitter:title" content={`${game.name} — CanIPlay`} />
+        <meta name="twitter:description" content={description} />
+        {game.headerImage && <meta name="twitter:image" content={game.headerImage} />}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'VideoGame',
+            name: game.name,
+            description: game.shortDescription || description,
+            genre: game.genres,
+            datePublished: game.releaseDate || undefined,
+            image: game.headerImage || undefined,
+            url: pageUrl,
+            author: game.developers?.length
+              ? game.developers.map((d) => ({ '@type': 'Organization', name: d.name, url: d.url }))
+              : undefined,
+          })}
+        </script>
+      </Helmet>
       <Link
         to="/"
         className="inline-flex w-fit items-center gap-1.5 text-sm text-text-muted transition-colors hover:text-text"
