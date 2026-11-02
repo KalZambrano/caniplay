@@ -16,6 +16,6 @@ export function formatVram(vramGb: number | null): string {
   return vramGb === null ? '—' : `~${vramGb} GB`
 }
 
-export function formatCores(cores: number | null): string {
-  return cores === null ? '—' : `${cores}`
+export function formatThreads(threads: number | null): string {
+  return threads === null ? '—' : `${threads}`
 }

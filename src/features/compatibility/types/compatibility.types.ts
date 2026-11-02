@@ -37,9 +37,22 @@ export interface BenchmarkEntry {
 
 export interface GpuBenchmarkEntry extends BenchmarkEntry {
   vramGb: number
+  /**
+   * Highest DirectX API version the GPU supports. Absent means DirectX 12 —
+   * only the handful of pre-DX12 entries in the table carry it.
+   */
+  maxDirectX?: number
 }
 
 export interface CpuBenchmarkEntry extends BenchmarkEntry {
-  /** Base clock in GHz — used only for the generic-spec heuristic (e.g. "Dual core at 2.8 GHz"), not the name-match comparison. */
+  /** Physical cores (P + E cores on hybrid Intel parts). */
+  cores: number
+  /** Hardware threads — what `navigator.hardwareConcurrency` reports. */
+  threads: number
+  /**
+   * Base clock in GHz. Informative only: it is NOT comparable across
+   * generations (an i5-12400 at 2.5 GHz base is several times faster than a
+   * Core 2 Duo at 3.0 GHz), so no verdict should be derived from it.
+   */
   baseClockGhz: number
 }

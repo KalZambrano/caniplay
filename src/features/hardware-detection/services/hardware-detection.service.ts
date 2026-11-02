@@ -74,7 +74,7 @@ function detectRam(): { ramGb: number | null; confidence: DetectionConfidence } 
   return { ramGb: deviceMemory, confidence: 'estimated' }
 }
 
-function detectCpuCores(): number | null {
+function detectCpuThreads(): number | null {
   return navigator.hardwareConcurrency ?? null
 }
 
@@ -86,7 +86,7 @@ export async function detectHardware(): Promise<DetectedHardware> {
     gpu,
     ramGb: ram.ramGb,
     ramConfidence: ram.confidence,
-    cpuCores: detectCpuCores(),
+    cpuThreads: detectCpuThreads(),
     cpuModel: null,
     webgpuSupported: typeof navigator.gpu !== 'undefined',
   }
