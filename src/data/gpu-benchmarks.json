@@ -8,7 +8,8 @@
       "radeon hd 3600"
     ],
     "score": 1,
-    "vramGb": 1
+    "vramGb": 1,
+    "maxDirectX": 10.1
   },
   {
     "name": "Intel HD Graphics 4000",
@@ -19,7 +20,8 @@
       "hd 4000"
     ],
     "score": 1,
-    "vramGb": 1
+    "vramGb": 1,
+    "maxDirectX": 11
   },
   {
     "name": "NVIDIA GeForce 8600 / 9600GT",
@@ -32,7 +34,8 @@
       "geforce 8600/9600gt"
     ],
     "score": 1,
-    "vramGb": 1
+    "vramGb": 1,
+    "maxDirectX": 10
   },
   {
     "name": "Intel UHD Graphics 620",

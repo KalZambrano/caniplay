@@ -3,7 +3,7 @@ import { Combobox } from '@/components/ui/combobox'
 import { Select } from '@/components/ui/select'
 import { useHardwareContext } from '../context/hardware-context'
 import { SpecPill } from './spec-pill'
-import { formatCores, formatRam, formatVram } from '../utils/format-hardware'
+import { formatRam, formatThreads, formatVram } from '../utils/format-hardware'
 import { CPU_MODEL_OPTIONS } from '../utils/cpu-options'
 import { RAM_GB_OPTIONS, toRamOption } from '../utils/ram-options'
 
@@ -82,9 +82,9 @@ export function HardwareScanPanel() {
         />
         <SpecPill
           icon={<Cpu className="size-4" />}
-          label="Núcleos"
-          value={formatCores(hardware.cpuCores)}
-          confidence={hardware.cpuCores !== null ? 'measured' : 'unknown'}
+          label="Hilos"
+          value={formatThreads(hardware.cpuThreads)}
+          confidence={hardware.cpuThreads !== null ? 'measured' : 'unknown'}
         />
       </div>
 
