@@ -14,6 +14,7 @@ interface PositionedModel {
   family: string
   generation: number
   tier: number
+  mobile: boolean
 }
 
 /** Sufijos que empujan un modelo por encima de su gama base, en pasos de gama. */
@@ -36,76 +37,110 @@ function suffixStep(suffix: string | undefined, steps: ReadonlyArray<[RegExp, nu
 }
 
 /**
- * Intel Core iX-NNNN y AMD Ryzen X NNNN. El número de generación va delante
- * del SKU: 4 cifras → la primera ("i7-4770K" es 4ª gen), 5 cifras → las dos
- * primeras ("i7-12700K" es 12ª).
+ * Intel Core (1ª–14ª gen + Core Ultra) y AMD Ryzen. El sufijo distingue chips
+ * de portátil (U/P/H/HX/HS) de los de escritorio (K/KF/F/X/X3D) para no dar por
+ * idéntico un i7 de 15 W con uno de 125 W.
  */
 function positionCpu(normalized: string): PositionedModel | null {
-  const intel = normalized.match(/\bi([3579])\s*(\d{4,5})/)
-  if (intel) {
-    const sku = intel[2]
+  const ultra = normalized.match(/\bcore\s+ultra\s+([579])\s+(\d{3})([a-z]{0,2})\b/)
+  if (ultra) {
+    const sku = Number(ultra[2])
+    const suffix = ultra[3] ?? ''
     return {
       family: 'intel-core',
-      generation: Number(sku.length === 5 ? sku.slice(0, 2) : sku.slice(0, 1)),
-      tier: Number(intel[1]) / 2,
+      generation: 14 + Math.floor(sku / 100),
+      tier: Number(ultra[1]) / 2,
+      mobile: /^(u|p|h|hx|v)$/.test(suffix),
     }
   }
 
-  const ryzen = normalized.match(/\bryzen\s*([3579])\s*(\d{4})/)
+  const intel = normalized.match(/\bi([3579])\s*(\d{3,5})([a-z]{0,2}\d?)\b/)
+  if (intel) {
+    const sku = intel[2]
+    const suffix = intel[3] ?? ''
+    const generation =
+      sku.length === 5 ? Number(sku.slice(0, 2)) : sku.length === 4 ? Number(sku.slice(0, 1)) : 1
+    return {
+      family: 'intel-core',
+      generation,
+      tier: Number(intel[1]) / 2,
+      mobile: /^(u|p|h|hx|hs|hq|hk|mq|qm|m|y|g\d)$/.test(suffix),
+    }
+  }
+
+  const ryzen = normalized.match(/\bryzen\s*([3579])\s*(\d{4})([a-z0-9]{0,3})\b/)
   if (ryzen) {
+    const suffix = ryzen[3] ?? ''
+    const x3dStep = suffix === 'x3d' ? 0.4 : 0
     return {
       family: 'amd-ryzen',
       generation: Number(ryzen[2].slice(0, 1)),
-      tier: Number(ryzen[1]) / 2,
+      tier: Number(ryzen[1]) / 2 + x3dStep,
+      mobile: /^(u|h|hs|hx|c|e)$/.test(suffix),
     }
   }
 
   return null
 }
 
+function hasMobileGpuMarker(normalized: string): boolean {
+  return (
+    /\b(mobile|laptop|max q|notebook|mobility)\b/.test(normalized) ||
+    /\b(?:gtx|rtx|gt|gts|rx|hd|r[579]|arc)\s*[ab]?\d{3,4}m\b/.test(normalized)
+  )
+}
+
 /**
- * GeForce (GTX/RTX) y Radeon RX. La numeración de NVIDIA es continua entre
- * GTX y RTX (10 → 16 → 20 → 30 → 40 → 50), así que ambas comparten familia:
- * una GTX 1660 y una RTX 2060 son generaciones consecutivas de verdad.
- *
- * Radeon sí se separa en dos familias: en "RX 580" el 5 es la serie y el 80
- * la gama, mientras que en "RX 5700" el 5 es la serie y el 700 la gama.
- * Mezclarlas haría que la RX 580 pasara por hermana de la RX 5700.
+ * GeForce (GTX/RTX), Radeon RX e Intel Arc. La numeración de NVIDIA es continua
+ * entre GTX y RTX, mientras que Radeon se separa entre RX 400/500 (tres cifras)
+ * y RX 5000–9000 (cuatro cifras).
  */
 function positionGpu(normalized: string): PositionedModel | null {
-  const nvidia = normalized.match(/\b(?:gtx|rtx)\s*(\d{3,4})\s*(ti super|super|ti)?\b/)
+  const mobile = hasMobileGpuMarker(normalized)
+
+  const nvidia = normalized.match(/\b(?:gtx|rtx)\s*(\d{3,4})m?\s*(ti super|super|ti)?\b/)
   if (nvidia) {
     const sku = Number(nvidia[1])
     return {
       family: 'nvidia-geforce',
       generation: Math.floor(sku / 100) / 10,
       tier: (sku % 100) / 10 + suffixStep(nvidia[2], NVIDIA_SUFFIX_STEPS),
+      mobile,
     }
   }
 
-  const radeon = normalized.match(/\brx\s*(\d{3,4})\s*(xtx|xt|gre)?\b/)
+  const radeon = normalized.match(/\brx\s*(\d{3,4})m?\s*(xtx|xt|gre)?\b/)
   if (radeon) {
     const sku = Number(radeon[1])
     const suffix = suffixStep(radeon[2], RADEON_SUFFIX_STEPS)
 
-    // RX 400/500: tres cifras, la primera es la serie ("RX 580" → serie 5, gama 80).
     if (radeon[1].length === 3) {
       return {
         family: 'amd-radeon-rx-legacy',
         generation: Math.floor(sku / 100),
         tier: (sku % 100) / 10 + suffix,
+        mobile,
       }
     }
 
-    // A partir de RDNA 4, AMD pasó a numerar como NVIDIA: en "RX 9070" el 90
-    // es la serie y el 70 la gama, mientras que en "RX 7700" el 7 es la serie
-    // y el 700 la gama. Leer la nueva con la regla vieja daba gama 0,7 y
-    // dejaba a las Radeon actuales sin ningún pariente cercano.
     const isCurrentScheme = sku >= 9000
     return {
       family: 'amd-radeon-rx',
       generation: isCurrentScheme ? Math.floor(sku / 100) / 10 : Math.floor(sku / 1000),
       tier: (isCurrentScheme ? sku % 100 : (sku % 1000) / 10) / 10 + suffix,
+      mobile,
+    }
+  }
+
+  const arc = normalized.match(/\barc\s+([ab])(\d{3})m?\b/)
+  if (arc) {
+    const gen = arc[1] === 'a' ? 1 : 2
+    const sku = Number(arc[2])
+    return {
+      family: 'intel-arc',
+      generation: gen,
+      tier: Math.floor(sku / 10) / 10,
+      mobile,
     }
   }
 
@@ -121,29 +156,23 @@ function positionModel(rawName: string): PositionedModel | null {
 /**
  * ¿El nombre pedido y la entrada que le asignó el buscador de aliases son de
  * verdad el mismo modelo?
- *
- * La búsqueda por alias acepta que el alias esté *contenido* en el texto, y eso
- * puede colar una variante inferior cuando la superior no está tabulada: sin
- * una entrada "RTX 5070 Ti", el alias "rtx 5070" encaja igual y el sufijo se
- * pierde sin dejar rastro. Comparar la posición de ambos nombres detecta esa
- * pérdida para poder presentarla como lo que es, una aproximación.
- *
- * Solo se pronuncia sobre nombres que sabe situar y de la misma familia: si no
- * reconoce alguno, o pertenecen a marcas distintas —lo normal cuando el texto
- * enumera alternativas y gana la de otra marca—, no hay discrepancia que
- * señalar.
  */
 export function describesSameModel(rawName: string, entryName: string): boolean {
   const requested = positionModel(rawName)
   const resolved = positionModel(entryName)
 
   if (!requested || !resolved || requested.family !== resolved.family) return true
-  return requested.generation === resolved.generation && requested.tier === resolved.tier
+  return (
+    requested.generation === resolved.generation &&
+    requested.tier === resolved.tier &&
+    requested.mobile === resolved.mobile
+  )
 }
 
 /** Un salto de gama aleja más que uno de generación: un i7 no es un i5 nuevo. */
 const TIER_WEIGHT = 1.5
 const GENERATION_WEIGHT = 1
+const FORM_FACTOR_WEIGHT = 1.2
 
 /**
  * Más allá de esto el "hermano" ya no se parece lo bastante como para que la
@@ -154,22 +183,13 @@ const MAX_SIBLING_DISTANCE = 3
 function distanceBetween(a: PositionedModel, b: PositionedModel): number {
   return (
     Math.abs(a.generation - b.generation) * GENERATION_WEIGHT +
-    Math.abs(a.tier - b.tier) * TIER_WEIGHT
+    Math.abs(a.tier - b.tier) * TIER_WEIGHT +
+    (a.mobile !== b.mobile ? FORM_FACTOR_WEIGHT : 0)
   )
 }
 
 /**
  * Busca el modelo conocido más parecido a uno que no está en la tabla.
- *
- * Ninguna tabla de referencia va a listar cada SKU que existe, y hasta ahora
- * cualquier hueco terminaba en "no pudimos identificarlo" — un veredicto en
- * blanco aunque el modelo fuese, por ejemplo, un i7-10700 rodeado de i7 de
- * esa misma generación ya tabulados. Situando ambos por familia, generación y
- * gama se puede señalar el vecino más cercano y comparar contra él.
- *
- * Es explícitamente una aproximación: quien la use debe presentarla como tal
- * y nunca convertirla en un "no cumple" categórico. Empatan a favor del
- * modelo más débil, que es el lado conservador para un requisito.
  */
 export function findApproximateBenchmarkMatch<T extends BenchmarkEntry>(
   rawName: string | null | undefined,

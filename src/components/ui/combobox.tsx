@@ -26,6 +26,7 @@ interface ComboboxProps {
   options: ComboboxOption[]
   value: string | null
   onChange: (value: string | null) => void
+  onQueryChange?: (query: string) => void
   placeholder?: string
   emptyMessage?: string
   className?: string
@@ -34,6 +35,14 @@ interface ComboboxProps {
 
 const LIST_MAX_HEIGHT = 224
 const GAP = 4
+const MAX_RENDERED_OPTIONS = 100
+
+function toSearchableString(value: string): string {
+  return normalizeSearchText(value)
+    .replace(/[-_/]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
 
 interface ListboxPosition {
   top: number
@@ -46,6 +55,7 @@ export function Combobox({
   options,
   value,
   onChange,
+  onQueryChange,
   placeholder,
   emptyMessage = 'Sin resultados.',
   className,
@@ -65,13 +75,36 @@ export function Combobox({
   const containerRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
 
-  const selectedLabel = options.find((option) => option.value === value)?.label ?? ''
+  const selectedLabel = options.find((option) => option.value === value)?.label ?? value ?? ''
 
-  const filteredOptions = useMemo(() => {
-    const target = normalizeSearchText(query)
-    if (!target) return options
-    return options.filter((option) => normalizeSearchText(option.label).includes(target))
-  }, [options, query])
+  const indexedOptions = useMemo(
+    () => options.map((option) => ({ option, searchable: toSearchableString(option.label) })),
+    [options],
+  )
+
+  const { cappedOptions, totalMatches } = useMemo(() => {
+    const tokens = toSearchableString(query).split(' ').filter(Boolean)
+    const matched =
+      tokens.length === 0
+        ? options
+        : indexedOptions
+            .filter(({ searchable }) => tokens.every((token) => searchable.includes(token)))
+            .map(({ option }) => option)
+
+    if (matched.length <= MAX_RENDERED_OPTIONS) {
+      return { cappedOptions: matched, totalMatches: matched.length }
+    }
+
+    const slice = matched.slice(0, MAX_RENDERED_OPTIONS)
+    if (value && !slice.some((option) => option.value === value)) {
+      const selected = matched.find((option) => option.value === value)
+      if (selected) {
+        slice[slice.length - 1] = selected
+      }
+    }
+
+    return { cappedOptions: slice, totalMatches: matched.length }
+  }, [indexedOptions, options, query, value])
 
   /**
    * Agrupa por `group` respetando el orden en que cada grupo aparece por
@@ -82,7 +115,7 @@ export function Combobox({
   const groups = useMemo(() => {
     const buckets = new Map<string, ComboboxOption[]>()
 
-    for (const option of filteredOptions) {
+    for (const option of cappedOptions) {
       const key = option.group ?? ''
       const bucket = buckets.get(key)
       if (bucket) bucket.push(option)
@@ -94,7 +127,7 @@ export function Combobox({
       label,
       entries: groupOptions.map((option) => ({ option, index: index++ })),
     }))
-  }, [filteredOptions])
+  }, [cappedOptions])
 
   const visibleOptions = useMemo(
     () => groups.flatMap((group) => group.entries.map((entry) => entry.option)),
@@ -138,6 +171,7 @@ export function Combobox({
 
       setIsOpen(false)
       setQuery('')
+      onQueryChange?.('')
     }
 
     document.addEventListener('mousedown', handlePointerDown)
@@ -149,7 +183,7 @@ export function Combobox({
       window.removeEventListener('scroll', updatePosition, true)
       window.removeEventListener('resize', updatePosition)
     }
-  }, [isOpen, updatePosition])
+  }, [isOpen, onQueryChange, updatePosition])
 
   // Reinicia la opción activa cuando cambia el filtro, para que nunca apunte
   // fuera de rango tras teclear.
@@ -174,6 +208,7 @@ export function Combobox({
   function closeList() {
     setIsOpen(false)
     setQuery('')
+    onQueryChange?.('')
   }
 
   function selectOption(option: ComboboxOption) {
@@ -184,6 +219,7 @@ export function Combobox({
   function clearSelection() {
     onChange(null)
     setQuery('')
+    onQueryChange?.('')
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
@@ -273,7 +309,9 @@ export function Combobox({
           autoComplete="off"
           value={isOpen ? query : selectedLabel}
           onChange={(event) => {
-            setQuery(event.target.value)
+            const nextQuery = event.target.value
+            setQuery(nextQuery)
+            onQueryChange?.(nextQuery)
             if (!isOpen) openList()
           }}
           onFocus={openList}
@@ -337,6 +375,11 @@ export function Combobox({
                   </div>
                 )
               })
+            )}
+            {totalMatches > visibleOptions.length && (
+              <div className="border-t border-border px-3 py-1.5 font-mono text-[0.65rem] text-text-faint">
+                Mostrando {visibleOptions.length} de {totalMatches} — escribe para filtrar
+              </div>
             )}
           </div>,
           document.body,
