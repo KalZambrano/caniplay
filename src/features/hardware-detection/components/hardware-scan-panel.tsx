@@ -4,11 +4,12 @@ import { Select } from '@/components/ui/select'
 import { useHardwareContext } from '../context/hardware-context'
 import { SpecPill } from './spec-pill'
 import { formatRam, formatThreads, formatVram } from '../utils/format-hardware'
-import { CPU_MODEL_OPTIONS } from '../utils/cpu-options'
+import { useCpuOptions } from '../hooks/use-cpu-options'
 import { RAM_GB_OPTIONS, toRamOption } from '../utils/ram-options'
 
 export function HardwareScanPanel() {
   const { hardware, status, detectedRamGb, setCpuModel, setRamGb } = useHardwareContext()
+  const { options: cpuOptions, onQueryChange: handleCpuQueryChange } = useCpuOptions()
   // Con valor vacío el select apunta a la fila «detectado»: así lo escaneado
   // sigue siendo una opción a la que volver después de haberlo cambiado.
   const isRamManual = hardware.ramConfidence === 'measured'
@@ -97,9 +98,10 @@ export function HardwareScanPanel() {
         </label>
         <Combobox
           id="cpu-model"
-          options={CPU_MODEL_OPTIONS}
+          options={cpuOptions}
           value={hardware.cpuModel}
           onChange={setCpuModel}
+          onQueryChange={handleCpuQueryChange}
           placeholder="Busca tu CPU… ej. Ryzen 5 3600"
           emptyMessage="No encontramos ese modelo en nuestra base de datos."
         />
