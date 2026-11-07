@@ -39,12 +39,18 @@ export interface GpuBenchmarkEntry extends BenchmarkEntry {
   vramGb: number
   /**
    * Highest DirectX API version the GPU supports. Absent means DirectX 12 —
-   * only the handful of pre-DX12 entries in the table carry it.
+   * only pre-DX12 entries in the table carry it.
    */
   maxDirectX?: number
+  /** Absent means `'desktop'` so the consumer JSON stays compact. */
+  formFactor?: 'desktop' | 'laptop' | 'igpu'
 }
 
 export interface CpuBenchmarkEntry extends BenchmarkEntry {
+  /** PassMark Single-Thread score. */
+  singleThreadScore: number
+  /** PassMark Multi-Thread score. */
+  multiThreadScore: number
   /** Physical cores (P + E cores on hybrid Intel parts). */
   cores: number
   /** Hardware threads — what `navigator.hardwareConcurrency` reports. */
