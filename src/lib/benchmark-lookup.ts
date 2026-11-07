@@ -56,6 +56,7 @@ function escapeRegExp(value: string): string {
  */
 function containsAsWords(target: string, alias: string): boolean {
   if (alias.length < MIN_CONTAINED_ALIAS_LENGTH) return false
+  if (!target.includes(alias)) return false
   return new RegExp(`(?:^|\\s)${escapeRegExp(alias)}(?:\\s|$)`).test(target)
 }
 

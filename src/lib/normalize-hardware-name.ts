@@ -19,6 +19,12 @@ const NOISE_PATTERNS: RegExp[] = [
  */
 export function normalizeHardwareName(raw: string): string {
   let value = raw
+    // PassMark y algunos juegos escriben "Core2 Duo" pegado.
+    .replace(/\bcore2\b/gi, 'core 2')
+    // Separa prefijos de GPU pegados al número ("GTX1060", "HD2600").
+    .replace(/\b(rtx|gtx|gts|rx|hd)(\d{3,4}(?:ti|xt|xtx|m)?)\b/gi, '$1 $2')
+    // Unifica "6GB" y "6 GB" para que los modelos con sufijo de VRAM encajen igual.
+    .replace(/(\d+(?:\.\d+)?)\s*(gb|mb)\b/gi, '$1 $2')
 
   for (const pattern of NOISE_PATTERNS) {
     value = value.replace(pattern, ' ')
