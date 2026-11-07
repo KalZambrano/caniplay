@@ -99,24 +99,26 @@ interface ResolvedModel<T extends BenchmarkEntry> {
   approximate: boolean
   /**
    * El modelo sí se reconoció, pero su score se ajustó por estimación (p. ej.
-   * una GPU de portátil escalada desde su versión de escritorio). Explica el
-   * ajuste en lenguaje llano.
+   * una GPU de portátil escalada desde su versión de escritorio).
    */
   adjustmentNote?: string
+  /**
+   * El modelo es de portátil: el navegador no expone su límite de potencia
+   * (TGP), que cambia bastante el rendimiento real entre fabricantes.
+   */
+  hasLaptopPowerVariance?: boolean
 }
 
-/** ¿El veredicto descansa en algo estimado, y no en el modelo exacto? */
+/** ¿El veredicto descansa en algo estimado o con varianza de potencia no observable? */
 function isEstimate(model: ResolvedModel<BenchmarkEntry>): boolean {
-  return model.approximate || model.adjustmentNote !== undefined
+  return (
+    model.approximate || model.adjustmentNote !== undefined || Boolean(model.hasLaptopPowerVariance)
+  )
 }
 
 /**
  * Resuelve un nombre libre contra la tabla: primero por nombre/alias y, si el
  * modelo no está tabulado, por el hermano de familia más parecido.
- *
- * Ese segundo intento es lo que evita el callejón sin salida de antes, donde
- * cualquier SKU ausente de la tabla —y son la mayoría, porque no existe lista
- * que las cubra todas— dejaba el requisito sin comparar.
  */
 function resolveModel<T extends BenchmarkEntry>(
   rawName: string | null | undefined,
@@ -125,9 +127,6 @@ function resolveModel<T extends BenchmarkEntry>(
   const matched = findBenchmarkMatch(rawName, table)
 
   if (matched && rawName) {
-    // La comprobación solo tiene sentido sobre un nombre suelto: cuando el
-    // texto enumera alternativas, que la elegida no sea la primera es el
-    // funcionamiento normal, no un modelo perdido por el camino.
     const namesOneModel = splitModelAlternatives(rawName).length === 1
     return {
       entry: matched,
@@ -140,18 +139,49 @@ function resolveModel<T extends BenchmarkEntry>(
 }
 
 /**
- * Como `resolveModel`, pero consciente de las GPUs de portátil: las resuelve
- * contra su versión de escritorio y escala el score, en vez de dejar que el
- * alias de escritorio las sobrevalore.
+ * Resuelve una GPU priorizando las entradas reales de portátil de TechPowerUp
+ * y cayendo al factor heurístico sobre la versión de escritorio solo cuando la
+ * variante móvil concreta no existe en la tabla.
  */
 function resolveGpuModel(
   rawName: string | null | undefined,
 ): ResolvedModel<GpuBenchmarkEntry> | null {
+  const direct = resolveModel(rawName, typedGpuBenchmarks)
   const variant = rawName ? detectMobileGpuVariant(rawName) : null
-  if (!variant) return resolveModel(rawName, typedGpuBenchmarks)
+
+  if (!variant) {
+    if (direct && direct.entry.formFactor === 'laptop') {
+      return { ...direct, hasLaptopPowerVariance: true }
+    }
+    return direct
+  }
+
+  // Si la tabla ya tiene el chip móvil real (p. ej. "RTX 3060 Mobile" o "RX 6800M"),
+  // usamos sus especificaciones reales en lugar de aplicar una penalización ciega.
+  if (direct && !direct.approximate && direct.entry.formFactor === 'laptop') {
+    if (variant.label === 'Max-Q' && !/\bmax-q\b/i.test(direct.entry.name)) {
+      return {
+        entry: {
+          ...direct.entry,
+          name: `${direct.entry.name} (Max-Q)`,
+          score: direct.entry.score * 0.85,
+        },
+        approximate: false,
+        hasLaptopPowerVariance: true,
+        adjustmentNote:
+          'Variante Max-Q ajustada sobre las especificaciones móviles de referencia (~85 %).',
+      }
+    }
+    return { ...direct, hasLaptopPowerVariance: true }
+  }
+
+  // Si es una integrada (Iris Xe, Radeon 780M/890M), no tiene contraparte de escritorio que escalar.
+  if (direct && direct.entry.formFactor === 'igpu') {
+    return direct
+  }
 
   const desktop = resolveModel(variant.desktopName, typedGpuBenchmarks)
-  if (!desktop || !hasMobileCounterpart(desktop.entry.name)) return desktop
+  if (!desktop || !hasMobileCounterpart(desktop.entry.name)) return direct ?? desktop
 
   const percent = Math.round(variant.factor * 100)
   const variantLabel = variant.label === 'Max-Q' ? 'Max-Q' : 'de portátil'
@@ -162,6 +192,7 @@ function resolveGpuModel(
       score: desktop.entry.score * variant.factor,
     },
     approximate: desktop.approximate,
+    hasLaptopPowerVariance: true,
     adjustmentNote: `Las GPUs ${variantLabel} rinden menos que su versión de escritorio; estimamos ~${percent} % de una ${desktop.entry.name}.`,
   }
 }
@@ -194,6 +225,9 @@ const SHORTFALL_NOTE: Record<'cpu' | 'gpu', string> = {
   cpu: 'Algo por debajo: bajar gráficos no compensa el CPU, así que puede haber caídas de FPS.',
 }
 
+const LAPTOP_TGP_NOTE =
+  'En portátiles el rendimiento real varía según el límite de potencia (TGP) de cada equipo.'
+
 /** Shared "known model vs known model" scoring, once both sides resolved to a table entry. */
 function buildRatioVerdict<T extends BenchmarkEntry>(
   component: 'cpu' | 'gpu',
@@ -204,6 +238,12 @@ function buildRatioVerdict<T extends BenchmarkEntry>(
 ): ComponentVerdict {
   const ratio = detected.entry.score / required.entry.score
   const isApproximate = isEstimate(detected) || isEstimate(required)
+  const laptopTgpNote =
+    (detected.hasLaptopPowerVariance || required.hasLaptopPowerVariance) &&
+    !detected.adjustmentNote &&
+    !required.adjustmentNote
+      ? LAPTOP_TGP_NOTE
+      : null
   const estimationNotes = [
     buildApproximationNote(required, detected),
     required.adjustmentNote,
@@ -226,20 +266,19 @@ function buildRatioVerdict<T extends BenchmarkEntry>(
       status: 'warn',
       requirementLabel,
       detectedLabel,
-      note: joinNotes(SHORTFALL_NOTE[component], ...estimationNotes),
+      note: joinNotes(SHORTFALL_NOTE[component], ...estimationNotes, laptopTgpNote),
     }
   }
 
   // Un "no cumple" es un veredicto tajante y solo se emite cuando ambos lados
-  // son el modelo real. Sobre un equivalente aproximado el margen de error
-  // puede ser mayor que la propia diferencia, así que se queda en aviso.
+  // son el modelo real sin varianza oculta de portátil.
   if (isApproximate) {
     return {
       component,
       status: 'warn',
       requirementLabel,
       detectedLabel,
-      note: joinNotes('Parece quedar por debajo del requisito.', ...estimationNotes),
+      note: joinNotes('Parece quedar por debajo del requisito.', ...estimationNotes, laptopTgpNote),
     }
   }
 
@@ -257,29 +296,17 @@ function formatMb(mb: number): string {
 }
 
 /**
- * Score equivalente de un requisito genérico ("Dual core at 2.8 GHz").
- *
- * Los GHz de un requisito no se pueden comparar con los de un CPU moderno:
- * llevan implícito el rendimiento por ciclo de la época en que se escribió el
- * texto. Comparar relojes crudos marcaba un i5-12400 (2.5 GHz base) como
- * inferior a un Core 2 Duo a 2.8 GHz, siendo varias veces más rápido.
- *
- * En vez de eso, el texto se traduce a la escala de la tabla suponiendo la
- * arquitectura más antigua plausible (Core 2 / Phenom II), que es la lectura
- * conservadora — nunca exige más de lo que el texto dice. Calibrado contra
- * las propias entradas de la tabla:
- *   Core 2 Duo E8400  (2 núcleos, 3.0 GHz) → 1.23 · 3.0 · 2^0.7 ≈ 6   (tabla: 6)
- *   Phenom II X4 965  (4 núcleos, 3.4 GHz) → 1.23 · 3.4 · 4^0.7 ≈ 11  (tabla: 10)
- *   FX-8350           (8 núcleos, 4.0 GHz) → 1.23 · 4.0 · 8^0.7 ≈ 21  (tabla: 19)
- * El exponente < 1 refleja que los juegos no escalan linealmente con núcleos.
+ * Score equivalente de un requisito genérico ("Dual core at 2.8 GHz") en la
+ * escala del índice gaming derivado de PassMark:
+ *   Core 2 Duo E8400  (2 núcleos, 3.0 GHz) → 2.85 · 3.0 · 2^0.55 ≈ 12.5 (tabla: 14.7)
+ *   Phenom II X4 965  (4 núcleos, 3.4 GHz) → 2.85 · 3.4 · 4^0.55 ≈ 20.8 (tabla: 21.4)
+ *   FX-8350           (8 núcleos, 4.0 GHz) → 2.85 · 4.0 · 8^0.55 ≈ 35.8 (tabla: 32.1)
  */
-const LEGACY_SCORE_PER_GHZ = 1.23
-const CORE_SCALING_EXPONENT = 0.7
+const LEGACY_SCORE_PER_GHZ = 2.85
+const CORE_SCALING_EXPONENT = 0.55
 
 function estimateGenericCpuScore(spec: GenericCpuSpec): number | null {
   if (spec.ghz === null) return null
-  // Sin núcleos explícitos ("2.4 GHz processor"), el texto es de la era de
-  // un solo núcleo.
   const cores = spec.cores ?? 1
   return LEGACY_SCORE_PER_GHZ * spec.ghz * cores ** CORE_SCALING_EXPONENT
 }
@@ -295,8 +322,7 @@ interface GenericCheck {
  * Núcleos pedidos contra lo que sabemos del equipo. Con el modelo elegido se
  * usan sus núcleos físicos reales; sin él solo tenemos los hilos que reporta
  * el navegador, y de ahí únicamente se deduce un rango: con N hilos hay entre
- * N/2 y N núcleos. Un i3 de 2 núcleos y 4 hilos no cumple "Quad core" aunque
- * el navegador diga 4.
+ * N/2 y N núcleos.
  */
 function checkCores(
   requiredCores: number,
@@ -315,14 +341,6 @@ function checkCores(
   return { outcome: 'ambiguous', label }
 }
 
-/**
- * Level 2 fallback for CPU: only reached when the requirement text didn't
- * match any known model. Compares whatever dimensions the text actually
- * states (core count, clock speed) against what we know about the user's
- * rig. Never returns "fail": this is an approximate heuristic, not a model
- * match, so a shortfall is reported as "warn" rather than a confident
- * rejection.
- */
 function compareCpuByGenericSpec(
   hardware: DetectedHardware,
   requirementLabel: string,
@@ -435,7 +453,32 @@ export function compareCpu(
       }
     }
 
-    return buildRatioVerdict('cpu', requirementLabel, hardware.cpuModel, detected, required)
+    const verdict = buildRatioVerdict(
+      'cpu',
+      requirementLabel,
+      hardware.cpuModel,
+      detected,
+      required,
+    )
+
+    // Gate de hilos: un CPU rápido por hilo pero con menos núcleos e hilos que
+    // el modelo pedido puede sufrir tirones en motores que reparten carga.
+    if (
+      verdict.status === 'pass' &&
+      detected.entry.cores < required.entry.cores &&
+      detected.entry.threads < required.entry.threads
+    ) {
+      return {
+        ...verdict,
+        status: 'warn',
+        note: joinNotes(
+          `Buen rendimiento por núcleo, pero tiene menos hilos (${detected.entry.cores} núcleos / ${detected.entry.threads} hilos frente a ${required.entry.cores}/${required.entry.threads}) y puede dar tirones en juegos exigentes.`,
+          verdict.note,
+        ),
+      }
+    }
+
+    return verdict
   }
 
   // Level 2: not a known model — see if it's a generic spec instead (e.g. "Dual core at 2.8 GHz").
@@ -464,11 +507,24 @@ function parseDirectXVersion(raw: string | null): number | null {
 const DEFAULT_MAX_DIRECTX = 12
 
 /**
- * Comprobación dura, independiente del score: una GPU que no admite la
- * versión de DirectX que pide el juego no lo arranca, por mucho que su
- * rendimiento bruto alcance. Devuelve el veredicto que debe sustituir al
- * normal, o null si la GPU cumple (o no sabemos lo suficiente para decirlo).
+ * Si todas las alternativas de un texto de requisito mencionan explícitamente
+ * una cantidad de VRAM ("GTX 1060 6GB / RX 580 8GB"), devuelve el mínimo en GB.
  */
+function extractExplicitVramFloorGb(requirementText: string): number | null {
+  const parts = requirementText.split(/\s*[,;|]\s*|\s+\/\s+|\s+(?:or|o|ó)\s+/i).filter(Boolean)
+  if (parts.length === 0) return null
+
+  const amountsGb: number[] = []
+  for (const part of parts) {
+    const spec = parseGenericGpuSpec(part)
+    // Si una alternativa no menciona VRAM, el requisito no impone un piso explícito.
+    if (!spec) return null
+    amountsGb.push(spec.vramMb / 1024)
+  }
+
+  return Math.min(...amountsGb)
+}
+
 function checkDirectXSupport(
   requirement: HardwareRequirement,
   requirementLabel: string,
@@ -481,8 +537,6 @@ function checkDirectXSupport(
   const supported = detected.entry.maxDirectX ?? DEFAULT_MAX_DIRECTX
   if (supported >= requiredVersion) return null
 
-  // Sobre un modelo aproximado no podemos asegurar qué versión admite la
-  // GPU real, así que se avisa en vez de rechazar.
   if (isEstimate(detected)) {
     return {
       component: 'gpu',
@@ -547,7 +601,6 @@ export function compareGpu(
   requirement: HardwareRequirement,
 ): ComponentVerdict {
   const requirementText = requirement.gpu
-  // Si el juego solo indica DirectX, eso es lo que se muestra como requisito.
   const requirementLabel =
     requirementText ?? (requirement.directx ? `DirectX ${requirement.directx}` : 'No especificado')
   const detectedName = hardware.gpu.name
@@ -564,8 +617,6 @@ export function compareGpu(
 
   const detected = resolveGpuModel(detectedName)
 
-  // La compatibilidad de DirectX va antes que cualquier comparación de
-  // rendimiento: si falla, el resto no importa.
   const directxVerdict = checkDirectXSupport(requirement, requirementLabel, detectedName, detected)
   if (directxVerdict) return directxVerdict
 
@@ -592,7 +643,26 @@ export function compareGpu(
       }
     }
 
-    return buildRatioVerdict('gpu', requirementLabel, detectedName, detected, required)
+    const verdict = buildRatioVerdict('gpu', requirementLabel, detectedName, detected, required)
+
+    const explicitVramFloorGb = extractExplicitVramFloorGb(requirementText)
+    if (
+      verdict.status === 'pass' &&
+      explicitVramFloorGb !== null &&
+      detected.entry.formFactor !== 'igpu' &&
+      detected.entry.vramGb < explicitVramFloorGb
+    ) {
+      return {
+        ...verdict,
+        status: 'warn',
+        note: joinNotes(
+          `El chip rinde lo suficiente, pero tu GPU tiene ~${detected.entry.vramGb} GB de VRAM y el requisito pide ${explicitVramFloorGb} GB: puede requerir bajar texturas.`,
+          verdict.note,
+        ),
+      }
+    }
+
+    return verdict
   }
 
   // Level 2: not a known model — see if it's a generic spec instead (e.g. "128 MB video card").
