@@ -11,4 +11,16 @@ export default defineConfig({
       '@': path.resolve(import.meta.dirname, './src'),
     },
   },
+  build: {
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            { name: 'gpu-benchmarks', test: /gpu-benchmarks\.json$/ },
+            { name: 'cpu-benchmarks', test: /cpu-benchmarks\.json$/ },
+          ],
+        },
+      },
+    },
+  },
 })
