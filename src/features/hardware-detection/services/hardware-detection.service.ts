@@ -1,5 +1,6 @@
 import gpuBenchmarks from '@/data/gpu-benchmarks.json'
 import { findBenchmarkMatch } from '@/lib/benchmark-lookup'
+import { isHardwareApiEnabled, resolveHardwareRemote } from '@/services/hardware-api.service'
 import type { GpuBenchmarkEntry } from '@/features/compatibility/types/compatibility.types'
 import type { DetectedGpu, DetectedHardware, DetectionConfidence } from '../types/hardware.types'
 import { parseWebglRenderer, type ParsedGpuString } from '../utils/parse-webgl-renderer'
@@ -53,6 +54,22 @@ async function detectGpu(): Promise<DetectedGpu> {
     detected.name,
     gpuBenchmarks as GpuBenchmarkEntry[],
   )
+
+  if (!match && isHardwareApiEnabled()) {
+    try {
+      const remote = await resolveHardwareRemote('gpu', detected.name)
+      if (remote.matched && remote.entry) {
+        return {
+          name: detected.name,
+          vendor: detected.vendor,
+          vramGb: remote.entry.vramGb,
+          confidence: 'estimated',
+        }
+      }
+    } catch {
+      // Fall through to unknown VRAM when offline.
+    }
+  }
 
   return {
     name: detected.name,
