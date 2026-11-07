@@ -6,7 +6,9 @@
     "genres": ["Acción", "Estrategia", "Free To Play"],
     "shortDescription": "MOBA competitivo gratuito con más de un centenar de héroes jugables.",
     "releaseDate": "9 jul 2013",
-    "developers": [{ "name": "Valve", "url": "https://store.steampowered.com/search/?developer=Valve" }],
+    "developers": [
+      { "name": "Valve", "url": "https://store.steampowered.com/search/?developer=Valve" }
+    ],
     "requirements": {
       "minimum": {
         "os": "windows",
@@ -26,7 +28,9 @@
     "genres": ["Aventura", "Indie"],
     "shortDescription": "Juego ficticio de ejemplo — exploración espacial en baja resolución.",
     "releaseDate": null,
-    "developers": [{ "name": "Studio X", "url": "https://store.steampowered.com/search/?developer=Studio%20X" }],
+    "developers": [
+      { "name": "Studio X", "url": "https://store.steampowered.com/search/?developer=Studio%20X" }
+    ],
     "requirements": {
       "minimum": {
         "os": "windows",
@@ -53,7 +57,9 @@
     "genres": ["Supervivencia", "Mundo abierto"],
     "shortDescription": "Juego ficticio de ejemplo — construcción y supervivencia medieval.",
     "releaseDate": null,
-    "developers": [{ "name": "Studio Y", "url": "https://store.steampowered.com/search/?developer=Studio%20Y" }],
+    "developers": [
+      { "name": "Studio Y", "url": "https://store.steampowered.com/search/?developer=Studio%20Y" }
+    ],
     "requirements": {
       "minimum": {
         "os": "windows",
@@ -80,7 +86,9 @@
     "genres": ["Acción", "Shooter"],
     "shortDescription": "Juego ficticio de ejemplo — shooter AAA de alta exigencia gráfica.",
     "releaseDate": null,
-    "developers": [{ "name": "Studio Z", "url": "https://store.steampowered.com/search/?developer=Studio%20Z" }],
+    "developers": [
+      { "name": "Studio Z", "url": "https://store.steampowered.com/search/?developer=Studio%20Z" }
+    ],
     "requirements": {
       "minimum": {
         "os": "windows",
@@ -107,7 +115,9 @@
     "genres": ["Casual", "Simulación"],
     "shortDescription": "Juego ficticio de ejemplo — simulador relajado de vida en pueblo.",
     "releaseDate": null,
-    "developers": [{ "name": "Studio W", "url": "https://store.steampowered.com/search/?developer=Studio%20W" }],
+    "developers": [
+      { "name": "Studio W", "url": "https://store.steampowered.com/search/?developer=Studio%20W" }
+    ],
     "requirements": {
       "minimum": {
         "os": "windows",

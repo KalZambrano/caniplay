@@ -29,14 +29,14 @@ cp .env.example .env   # ya viene con VITE_USE_MOCK_DATA=true
 npm run dev
 ```
 
-| Script | Qué hace |
-| --- | --- |
-| `npm run dev` | Servidor de desarrollo |
-| `npm run build` | Typecheck (`tsc -b`) + build de producción |
-| `npm run preview` | Sirve el build de producción localmente |
-| `npm run lint` | `oxlint` sobre todo el proyecto |
-| `npm run typecheck` | Solo typecheck, sin build |
-| `npm run format` | Formatea con Prettier |
+| Script              | Qué hace                                   |
+| ------------------- | ------------------------------------------ |
+| `npm run dev`       | Servidor de desarrollo                     |
+| `npm run build`     | Typecheck (`tsc -b`) + build de producción |
+| `npm run preview`   | Sirve el build de producción localmente    |
+| `npm run lint`      | `oxlint` sobre todo el proyecto            |
+| `npm run typecheck` | Solo typecheck, sin build                  |
+| `npm run format`    | Formatea con Prettier                      |
 
 ## Modo mock vs. backend real
 
