@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet, ScrollRestoration } from 'react-router-dom'
 import { Header } from '@/components/layout/header'
 import { Footer } from '@/components/layout/footer'
 import { SkipLink } from '@/components/ui/skip-link'
@@ -12,6 +12,8 @@ export function MainLayout() {
         <Outlet />
       </main>
       <Footer />
+      {/* Restaura el scroll al volver atrás (y lo sube al entrar a una página nueva). */}
+      <ScrollRestoration />
     </div>
   )
 }

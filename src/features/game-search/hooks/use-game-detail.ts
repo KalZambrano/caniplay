@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getGameById } from '../services/games.service'
+import { getCachedGame, getGameById } from '../services/games.service'
 import type { GameDetail } from '../types/game.types'
 
 export type GameDetailStatus = 'loading' | 'success' | 'not-found' | 'error'
@@ -10,9 +10,23 @@ interface UseGameDetailResult {
   errorMessage: string | null
 }
 
+function statusFor(
+  id: string | undefined,
+  cached: GameDetail | null | undefined,
+): GameDetailStatus {
+  if (!id || cached === null) return 'not-found'
+  return cached ? 'success' : 'loading'
+}
+
 export function useGameDetail(id: string | undefined): UseGameDetailResult {
-  const [game, setGame] = useState<GameDetail | null>(null)
-  const [status, setStatus] = useState<GameDetailStatus>('loading')
+  // Si el detalle ya se precargó (hover en la tarjeta) o se visitó antes, se
+  // pinta en el primer render sin pasar por el spinner.
+  const [game, setGame] = useState<GameDetail | null>(() =>
+    id ? (getCachedGame(id) ?? null) : null,
+  )
+  const [status, setStatus] = useState<GameDetailStatus>(() =>
+    statusFor(id, id ? getCachedGame(id) : undefined),
+  )
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   useEffect(() => {
@@ -21,8 +35,16 @@ export function useGameDetail(id: string | undefined): UseGameDetailResult {
       return
     }
 
+    const cached = getCachedGame(id)
+    if (cached !== undefined) {
+      setGame(cached)
+      setStatus(cached ? 'success' : 'not-found')
+      return
+    }
+
     let cancelled = false
     setStatus('loading')
+    setErrorMessage(null)
 
     getGameById(id)
       .then((result) => {
