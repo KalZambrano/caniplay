@@ -1,9 +1,11 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { Gamepad2 } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { pickGradient } from '@/lib/pick-gradient'
+import { prefetchGame } from '../services/games.service'
 import type { GameSearchResult } from '../types/game.types'
+import type { GameDetailLocationState } from '../types/navigation.types'
 
 interface GameCardProps {
   game: GameSearchResult
@@ -17,6 +19,13 @@ export function GameCard({ game }: GameCardProps) {
   // nunca y dejar la imagen recargándose en bucle.
   const [source, setSource] = useState(game.headerImageLarge ?? game.headerImage)
   const [hasFailed, setHasFailed] = useState(false)
+  const location = useLocation()
+
+  // Se guarda de dónde viene el usuario para que el detalle pueda ofrecer un
+  // "Volver a los resultados" que regrese de verdad en el historial.
+  const linkState: GameDetailLocationState = {
+    from: { pathname: location.pathname, search: location.search },
+  }
 
   function handleError() {
     if (source !== game.headerImage) {
@@ -29,6 +38,9 @@ export function GameCard({ game }: GameCardProps) {
   return (
     <Link
       to={`/juego/${game.id}`}
+      state={linkState}
+      onMouseEnter={() => prefetchGame(game.id)}
+      onFocus={() => prefetchGame(game.id)}
       className="group overflow-hidden rounded-lg border border-border bg-bg-elevated transition-colors hover:border-brand focus-visible:border-brand"
     >
       <div className="aspect-header overflow-hidden bg-bg-inset">

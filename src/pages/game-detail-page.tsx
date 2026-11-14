@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/cn'
 import { pickGradient } from '@/lib/pick-gradient'
 import { useGameDetail } from '@/features/game-search/hooks/use-game-detail'
+import { useBackToSearch } from '@/features/game-search/hooks/use-back-to-search'
 import { useHardwareContext } from '@/features/hardware-detection/context/hardware-context'
 import { useCompatibility } from '@/features/compatibility/hooks/use-compatibility'
 import { CompatibilityReport } from '@/features/compatibility/components/compatibility-report'
@@ -17,6 +18,7 @@ export function GameDetailPage() {
   const { game, status, errorMessage } = useGameDetail(id)
   const { hardware } = useHardwareContext()
   const report = useCompatibility(game?.requirements ?? null, hardware)
+  const back = useBackToSearch()
 
   usePageTitle(game ? `${game.name} — CanIPlay` : 'CanIPlay')
 
@@ -37,9 +39,9 @@ export function GameDetailPage() {
     return (
       <div className="py-24 text-center" role="alert" aria-live="polite">
         <p className="text-text-muted">No encontramos ese juego.</p>
-        <Link to="/" className="mt-4 inline-block">
+        <Link to={back.to} onClick={back.onClick} className="mt-4 inline-block">
           <Button variant="secondary" icon={<ArrowLeft className="size-4" aria-hidden />}>
-            Volver a buscar
+            {back.label}
           </Button>
         </Link>
       </div>
@@ -100,11 +102,12 @@ export function GameDetailPage() {
         </script>
       </Helmet>
       <Link
-        to="/"
+        to={back.to}
+        onClick={back.onClick}
         className="inline-flex w-fit items-center gap-1.5 text-sm text-text-muted transition-colors hover:text-text"
       >
         <ArrowLeft className="size-4" aria-hidden />
-        Volver a buscar
+        {back.label}
       </Link>
 
       {/* Título y géneros a ancho completo: encajonados en la columna estrecha
