@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
-import { getFeaturedGames } from '../services/games.service'
+import { getCachedFeaturedGames, getFeaturedGames } from '../services/games.service'
 import type { GameSearchResult } from '../types/game.types'
 
 export function useFeaturedGames() {
-  const [games, setGames] = useState<GameSearchResult[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [games, setGames] = useState<GameSearchResult[]>(() => getCachedFeaturedGames() ?? [])
+  const [isLoading, setIsLoading] = useState(() => getCachedFeaturedGames() === undefined)
 
   useEffect(() => {
     let cancelled = false
